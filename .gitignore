@@ -1,0 +1,9 @@
+cache/*
+errors/*
+sessions/*
+uploads/*
+*.pyc
+*~
+.sass-cache
+.sass-cache/*
+progress.log
