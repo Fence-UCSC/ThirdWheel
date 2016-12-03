@@ -90,7 +90,7 @@ plugins = PluginManager()
 # -------------------------------------------------------------------------
 # create all tables needed by auth if not custom tables
 # -------------------------------------------------------------------------
-auth.define_tables(username=False, signature=False)
+# auth.define_tables(username=False, signature=False)
 
 # -------------------------------------------------------------------------
 # configure email
@@ -133,6 +133,12 @@ auth.settings.reset_password_requires_verification = True
 
 # Google signin
 auth.settings.actions_disabled=['register','change_password','request_reset_password']
+auth.settings.extra_fields['auth_user'] = [
+    Field('picture', writable=False),
+    Field('gender', writable=False)
+]
+auth.define_tables(username=False, signature=False)
+db.auth_user.email.writable = False
 
 import urllib2
 from gluon.contrib.login_methods.oauth20_account import OAuthAccount
@@ -170,10 +176,25 @@ class googleAccount(OAuthAccount):
             session.token = None
             return
         data = uinfo_stream.read()
-        pic = "http://picasaweb.google.com/data/entry/api/user/ uinfo['id']  ?alt=json"
         uinfo = json.loads(data)
+        # {
+        # u'family_name': u'Valera',
+        # u'name': u'August Valera',
+        # u'picture': u'https://lh6.googleusercontent.com/-gHRMqPl0Z58/AAAAAAAAAAI/AAAAAAAALsY/b00VZAT4Qww/photo.jpg',
+        # u'locale': u'en',
+        # u'gender': u'male',
+        # u'email': u'4u6u57@gmail.com',
+        # u'link': u'https://plus.google.com/+AugustValera',
+        # u'given_name': u'August',
+        # u'id': u'114655556845105029593',
+        # u'verified_email': True
+        # }
         return dict(first_name=uinfo['given_name'],
                     last_name=uinfo['family_name'],
-                    username=uinfo['id'], email=uinfo['email'], pic=pic)
+                    username=uinfo['id'],
+                    email=uinfo['email'],
+                    picture=uinfo['picture'],
+                    gender=uinfo['gender']
+                    )
 
 auth.settings.login_form = googleAccount()
