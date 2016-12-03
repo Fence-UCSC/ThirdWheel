@@ -1,0 +1,20 @@
+{
+  "name": "ChandlrWheelr",
+  "homepage": "https://github.com/Fence-UCSC/ChandlrWheelr",
+  "authors": [
+    "Fence"
+  ],
+  "description": "Collaborative decision making webapp",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "material-design-lite": "^1.2.1"
+  }
+}
