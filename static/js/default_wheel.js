@@ -53,19 +53,33 @@ var app = function() {
                 });
             }
         );
-    }
+    };
 
     self.add_suggestion = function() {
-        $.post(add_suggestion_url,
-            {
-                wheel: wheel_id,
-                name: name,
-                description: description
-            }, function () {
-                // Clear form
-            }
-        );
-    }
+        console.log('add_suggestion(' + wheel_id + ', '
+                + self.vue.adder_name + ', ' + self.vue.adder_description + ')');
+        if(self.vue.adder_name.length) {
+            $.post(add_suggestion_url,
+                {
+                    wheel: wheel_id,
+                    name: self.vue.adder_name,
+                    description: self.vue.adder_description
+                }, function () {
+                    self.adder_button();
+                }
+            );
+        } else {
+            console.log('  No title given');
+            $("#adder-name-warn").show();
+        }
+    };
+
+    self.adder_button = function() {
+        console.log('adder_button()');
+        $(".add-toggle").toggle();
+        self.vue.adder_name = '';
+        self.vue.adder_description = '';
+    };
 
     // Complete as needed.
     self.vue = new Vue({
@@ -76,11 +90,14 @@ var app = function() {
             wheel: null,
             suggestions: [],
             suggestions_updated: earliest_time,
+            adder_name: null,
+            adder_description: null
         },
         methods: {
             get_wheel: self.get_wheel,
             get_suggestions: self.get_suggestions,
-            add_suggestion: self.add_suggestion
+            add_suggestion: self.add_suggestion,
+            adder_button: self.adder_button
         }
     });
 

@@ -7,7 +7,7 @@
     var wheel_id = {{=args}};
     var get_wheel_url = "{{=URL('api', 'get_wheel')}}";
     var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
-    var add_suggestion_url = "{{=URL('api', 'add_suggestion')}}";
+    var add_suggestion_url = "{{=URL('api', 'add_suggestion', user_signature=True)}}";
 </script>
 {{end}}
 
@@ -118,27 +118,30 @@
                 </div>
             </div>
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col add-toggle" id="adder">
-                <form>
+                <form v-on:submit.prevent="add_suggestion" method="post">
                     <div class="mdl-card__title">
                         <h2 class="mdl-card__title-text">Add a suggestion</h2>
                     </div>
                     <div class="mdl-card__supporting-text">
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input class="mdl-textfield__input" type="text">
-                            <label class="mdl-textfield__label" for="add-input-name">Title</label>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-invalid">
+                            <input class="mdl-textfield__input" v-model="adder_name" pattern=".*[^\s].*"
+                                   type="text">
+                            <label class="mdl-textfield__label">Title</label>
+                            <span class="mdl-textfield__error">Title cannot be blank!</span>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <textarea class="mdl-textfield__input" type="text" rows= "3">
+                            <textarea class="mdl-textfield__input" v-model="adder_description" type="text" rows= "3">
                             </textarea>
-                            <label class="mdl-textfield__label" for="add-input-description">Description</label>
+                            <label class="mdl-textfield__label">Description</label>
                         </div>
                     </div>
                     <div class="mdl-card__actions mdl-card--border">
-                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                        type="submit">
                           Add
                         </button>
                         <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                        type="button" onclick='$(".add-toggle").toggle()'>
+                        type="button" v-on:click='adder_button()'>
                           Cancel
                         </button>
                     </div>
@@ -147,7 +150,7 @@
             </div>
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col">
                 <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored
-                add-toggle" id="card-fab" onclick='$(".add-toggle").toggle()'>
+                add-toggle" id="card-fab" v-on:click='adder_button()'>
                     <i class="material-icons">add</i>
                 </button>
                 <div class="mdl-card__title">
