@@ -57,6 +57,7 @@ def add_wheel():
 # wheel is the wheel to be edited
 # name, if provided, will give the specified wheel a new name
 # description, if provided, will give the specified wheel a new description
+
 @auth.requires_signature()
 def edit_wheel():
     wheel=request.vars.get('wheel')

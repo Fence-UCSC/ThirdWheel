@@ -3,6 +3,11 @@
     color: blue;
 }
 
+.profile_link {
+    font-size: 0.9em;
+    color: green;
+}
+
 .secondary_item_even {
     font-size: 0.8em;
     margin-left: 5px;
@@ -20,4 +25,5 @@
 .form-horizontal {
     margin-left:10px;
 }
+
 
