@@ -99,6 +99,10 @@ var app = function() {
     };
     //-----------------------delete a wheel--------------------------
 
+    self.goto_wheel_page = function(){
+
+    };
+
 
     self.goto_wheel_url = function(wheel_id){
         var url = 'wheel/';
