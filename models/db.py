@@ -135,7 +135,8 @@ auth.settings.reset_password_requires_verification = True
 auth.settings.actions_disabled=['register','change_password','request_reset_password']
 auth.settings.extra_fields['auth_user'] = [
     Field('picture', writable=False),
-    Field('gender', writable=False)
+    Field('gender', writable=False),
+    Field('bio', 'text', default='This user has not yet added a Bio')
 ]
 auth.define_tables(username=False, signature=False)
 db.auth_user.email.writable = False
