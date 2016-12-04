@@ -35,6 +35,37 @@ def add_wheel():
         return response.json({"error": "name must not be null"})
     id=db.wheel.insert(name=name, description=description)
     return response.json(db.wheel(id))
+ 
+# Parameters: wheel=wheel.id, [name=<string>, description=<string>]
+# wheel is the wheel to be edited
+# name, if provided, will give the specified wheel a new name
+# description, if provided, will give the specified wheel a new description
+@auth.requires_signature()
+def edit_wheel():
+    wheel=request.vars.get('wheel')
+    name=request.vars.get('name')
+    description=request.vars.get('description')
+    if wheel == None:
+        response.status=400
+        return response.json({"error": "wheel must not be null"})
+    if name == None and description == None:
+        response.status=400
+        return response.json({"error": "edit_wheel must have a name or description to update to"})
+    if name != None:
+        db.wheel(wheel).update_record(name=name)
+    if description != None:
+        db.wheel(wheel).update_record(description=description)
+    return response.json(db.wheel(wheel))
+    
+# Parameters: wheel=wheel.id
+# wheel is the wheel to delete
+@auth.requres_signature()
+def del_wheel():
+    wheel=request.vars.get('wheel')
+    if wheel == None:
+        response.status=400
+        return response.json({"error":"wheel must not be null"})
+    db.wheel(wheel).delete()
     
 # Parameters: wheel=wheel.id, name=<string>, [description=<string>]
 # wheel is the id of the wheel this suggestion belongs to
@@ -52,6 +83,37 @@ def add_suggestion():
         return response.json({"message":"This wheel is past its suggestion creation phase"})
     id=db.suggestion.insert(wheel=wheel_id, name=name, description=description)
     return response.json(db.suggestion(id))
+    
+# Parameters: suggestion=suggestion.id, [name=<string>, description=<string>]
+# wheel is the wheel to be edited
+# name, if provided, will give the specified wheel a new name
+# description, if provided, will give the specified wheel a new description
+@auth.requires_signature()
+def edit_suggestion():
+    suggestion=request.vars.get('suggestion')
+    name=request.vars.get('name')
+    description=request.vars.get('description')
+    if suggestion == None:
+        response.status=400
+        return response.json({"error": "suggestion must not be null"})
+    if name == None and description == None:
+        response.status=400
+        return response.json({"error": "edit_suggestion must have a name or description to update to"})
+    if name != None:
+        db.suggestion(suggestion).update_record(name=name)
+    if description != None:
+        db.suggestion(suggestion).update_record(description=description)
+    return response.json(db.suggestion(suggestion))
+    
+# Parameters: suggestion=suggestion.id
+# wheel is the wheel to delete
+@auth.requres_signature()
+def del_suggestion():
+    suggestion=request.vars.get('suggestion')
+    if suggestion == None:
+        response.status=400
+        return response.json({"error":"suggestion must not be null"})
+    db.suggestion(suggestion).delete()
 
 # Helper function for vote()
 def sum_points_for_user(user_id, suggestion):
