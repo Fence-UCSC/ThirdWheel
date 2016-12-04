@@ -27,6 +27,10 @@ def get_wheels():
     rows = db().select(orderby=~db.wheel.id, limitby=(start_idx, end_idx + 1))
     for i, r in enumerate(rows):
         if i < end_idx - start_idx:
+            if r.chosen_one == -1:
+                chosen_one_string = 'N/A'
+            else:
+                chosen_one_string = 'placeholder'
             t = dict(
                 id=r.id,
                 creator_id=r.creator_id,
@@ -34,7 +38,7 @@ def get_wheels():
                 description=r.description,
                 creation_time=r.creation_time,
                 phase=r.phase,
-                chosen_one=r.chosen_one,
+                chosen_one=chosen_one_string,
             )
             wheels.append(t)
         else:
@@ -62,7 +66,7 @@ def add_wheel():
     return response.json(dict(wheel=t))
 
 @auth.requires_signature()
-def del_post():
+def del_wheel():
     """Used to delete a post."""
     # Implement me!
     db(db.wheel.id == request.vars.wheel_id).delete()

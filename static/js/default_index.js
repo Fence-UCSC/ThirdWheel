@@ -46,14 +46,14 @@ var app = function() {
         // The submit button to add a track has been added.
         $.post(add_wheel_url,
             {
-                name: self.vue.form_wheel_name,
+                name: self.vue.form_name,
                 description: self.vue.form_description,
             },
             function (data) {
                 $.web2py.enableElement($("#add_post_submit"));
                 self.vue.wheels.unshift(data.wheel);
                 self.get_wheels();
-                self.vue.form_wheel_name = '';
+                self.vue.form_name = '';
             });
     };
 
@@ -68,7 +68,7 @@ var app = function() {
         // The button to add a post has been pressed.
         if(self.vue.current_user != '') {
             self.vue.is_adding_wheel = !self.vue.is_adding_wheel;
-            self.vue.form_wheel_name = '';
+            self.vue.form_name = '';
         }
     };
     //-----------------------add a wheel-----------------------------
