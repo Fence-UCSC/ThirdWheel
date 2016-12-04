@@ -21,7 +21,7 @@ def get_wheels():
             if r.chosen_one == -1:
                 chosen_one_string = 'N/A'
             else:
-                chosen_one_string = 'placeholder'
+                chosen_one_string = db(db.suggestion.id == r.chosen_one).select().first().name
             creator_name = db(db.auth_user.id == r.creator_id).select().first().email
             t = dict(
                 id=r.id,

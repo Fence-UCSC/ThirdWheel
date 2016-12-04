@@ -87,9 +87,9 @@
                             <a class="profile_link" v-on:click="goto_profile_url(wheel.creator_id)">${wheel.creator_name}</a>
                             <span class="secondary_item_odd">Phase: ${wheel.phase}</span>
                             <span class="secondary_item_even">Created On: ${wheel.creation_time}</span>
-                            <span class="secondary_item_odd">Chosen one: ${wheel.chosen_one}</span>
+                            <span id="too_long_chosen" class="secondary_item_odd">Chosen one: ${wheel.chosen_one}</span>
                             <span id="too_long" class="mdl-list__item-text-body">${wheel.description}</span>
-                        </div>
+      span              </div>
                         <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="wheel-content-editing">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" id="no_table_wheel_content__row">
                             <input class="mdl-textfield__input" id="no_table_wheel" name="Content" type="text" v-model="form_name">
