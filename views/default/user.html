@@ -15,6 +15,8 @@
             if not 'request_reset_password' in auth.settings.actions_disabled:
                 form.add_button(T('Lost Password'),URL(args='request_reset_password'),_class='btn btn-default')
             pass
+        elif request.args(0)=='profile':
+            form.add_button(T('Delete Account Placeholder'),'http://google.com',_class='btn btn-danger')
         pass
         =form
         }}

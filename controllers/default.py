@@ -17,9 +17,41 @@ def index():
     if you need a simple wiki simply replace the two lines below with:
     return auth.wiki()
     """
-    response.flash = T("Hello reBull")
     return dict(message=T('Welcome to web2py!'))
 
+
+def wheel():
+    form = None
+    args = request.args(0)
+    wheelr = None
+
+    # Handle argument (page type)
+    if args is None:
+        redirect(URL(args="new"))
+    elif args == "new":
+        if auth.user_id is None:
+            session.flash = T('You must be logged in to create a wheel')
+            redirect(URL('user','login',vars={'_next':URL('default','wheel',args='new')}))
+        form = SQLFORM(db.wheel)
+        form.add_button(T('Cancel'),URL('default','index'),_class="btn btn-warning")
+    else:
+        try:
+            wheelr = db.wheel(args)
+        except ValueError:
+            session.flash = T('Invalid wheel id ' + args)
+            redirect(URL('default','index'))
+        if wheelr is None:
+            session.flash = T('Wheel #' + args + ' does not exist')
+            redirect(URL('default','index'))
+        form = SQLFORM(db.wheel, wheelr, deletable=True, showid=False)
+        form.add_button(T('Cancel'),URL('default','wheel',args=args),_class="btn btn-warning")
+
+    # Form acceptance
+    if form and form.process().accepted:
+        session.flash = T("Wheel updated")
+        redirect(URL('default','wheel',args=form.vars.id))
+
+    return dict(form=form,args=args,wheel=wheelr)
 
 def user():
     """

@@ -90,7 +90,7 @@ plugins = PluginManager()
 # -------------------------------------------------------------------------
 # create all tables needed by auth if not custom tables
 # -------------------------------------------------------------------------
-auth.define_tables(username=False, signature=False)
+# auth.define_tables(username=False, signature=False)
 
 # -------------------------------------------------------------------------
 # configure email
@@ -130,3 +130,71 @@ auth.settings.reset_password_requires_verification = True
 # after defining tables, uncomment below to enable auditing
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
+
+# Google signin
+auth.settings.actions_disabled=['register','change_password','request_reset_password']
+auth.settings.extra_fields['auth_user'] = [
+    Field('picture', writable=False),
+    Field('gender', writable=False)
+]
+auth.define_tables(username=False, signature=False)
+db.auth_user.email.writable = False
+
+import urllib2
+from gluon.contrib.login_methods.oauth20_account import OAuthAccount
+
+try:
+    import json
+except ImportError:
+    from gluon.contrib import simplejson as json
+
+class googleAccount(OAuthAccount):
+    AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
+    TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
+    client_id = "54188213251-9mkd2ak9t8it6t4ob21j7mjp19qh3b1j.apps.googleusercontent.com"
+    client_secret = "vijRAnXCJmWdC2CrvhPkAHl7"
+
+    def __init__(self):
+        OAuthAccount.__init__(self,
+                              client_id=self.client_id,
+                              client_secret=self.client_secret,
+                              auth_url=self.AUTH_URL,
+                              token_url=self.TOKEN_URL,
+                              approval_prompt='force', state='auth_provider=google',
+                              scope='https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email')
+
+    def get_user(self):
+        token = self.accessToken()
+        if not token:
+            return None
+
+        uinfo_url = 'https://www.googleapis.com/oauth2/v1/userinfo?access_token=%s' % urllib2.quote(token, safe='')
+        uinfo = None
+        try:
+            uinfo_stream = urllib2.urlopen(uinfo_url)
+        except:
+            session.token = None
+            return
+        data = uinfo_stream.read()
+        uinfo = json.loads(data)
+        # {
+        # u'family_name': u'Valera',
+        # u'name': u'August Valera',
+        # u'picture': u'https://lh6.googleusercontent.com/-gHRMqPl0Z58/AAAAAAAAAAI/AAAAAAAALsY/b00VZAT4Qww/photo.jpg',
+        # u'locale': u'en',
+        # u'gender': u'male',
+        # u'email': u'4u6u57@gmail.com',
+        # u'link': u'https://plus.google.com/+AugustValera',
+        # u'given_name': u'August',
+        # u'id': u'114655556845105029593',
+        # u'verified_email': True
+        # }
+        return dict(first_name=uinfo['given_name'],
+                    last_name=uinfo['family_name'],
+                    username=uinfo['id'],
+                    email=uinfo['email'],
+                    picture=uinfo['picture'],
+                    gender=uinfo['gender']
+                    )
+
+auth.settings.login_form = googleAccount()
