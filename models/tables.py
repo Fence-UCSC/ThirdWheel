@@ -5,6 +5,7 @@ db.define_table('wheel',
                 Field('name', required=True),
                 Field('description', 'text'),
                 Field('creation_time', 'datetime', default=datetime.datetime.utcnow()),
+                Field('edited_time', 'datetime', default=datetime.datetime.utcnow()),
                 Field('phase', default='create'),
                 Field('chosen_one', 'integer', default=-1)
                 )
@@ -15,6 +16,7 @@ db.define_table('suggestion',
                 Field('name', required=True),
                 Field('description', 'text'),
                 Field('creation_time', 'datetime', default=datetime.datetime.utcnow()),
+                Field('update_time', 'datetime', default=datetime.datetime.utcnow()),
                 Field('point_value', 'integer', default=0)
                 )
 
