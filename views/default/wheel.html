@@ -1,14 +1,35 @@
 {{extend 'layout.html'}}
 
+{{block head}}
+<link rel="stylesheet" type="text/css" href="static/css/homepage.css" media="screen" />
+<script src="{{=URL('static', 'js/vue.js')}}"></script>
+<script>
+    var wheel_id = {{=args}};
+    var get_wheel_url = "{{=URL('api', 'get_wheel')}}";
+    var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
+</script>
+{{end}}
+
+
         <style>
             .wheelr {
                 max-width: 1000px;
                 margin: auto;
+                z-index: 10;
             }
             .wheelr .mdl-card {
                 margin: 5px;
             }
             #editor {
+                display: none;
+            }
+            #fab {
+                bottom: 25px;
+                right: 25px;
+                position: fixed;
+                z-index: 20;
+            }
+            #vue-div {
                 display: none;
             }
         </style>
@@ -26,7 +47,7 @@
         </div>
 
         {{else:}}
-        <div class="mdl-grid wheelr">
+        <div class="mdl-grid wheelr" id="vue-div">
             <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle" id="editor">
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Edit wheel info</h2>
@@ -37,10 +58,10 @@
             </div>
             <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
                 <div class="mdl-card__title">
-                    <h2 class="mdl-card__title-text">{{=wheel.name}}</h2>
+                    <h2 v-if="wheel && wheel.name" class="mdl-card__title-text">${wheel.name}</h2>
                 </div>
-                <div class="mdl-card__supporting-text">
-                    {{=wheel.description}}
+                <div v-if="wheel && wheel.description" class="mdl-card__supporting-text">
+                    ${wheel.description}
                 </div>
             </div>
             <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
@@ -55,9 +76,19 @@
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Placeholder for suggestions</h2>
                 </div>
-                <div class="mdl-card__supporting-text">
-                    Put suggestions list here
-                </div>
+                <ul class="mdl-list">
+                    <li v-for="suggestion in suggestions" class="mdl-list__item">
+                        <span class="mdl-list__item-primary-content">
+                              <span>${suggestion.name}</span>
+                        </span>
+                    </li>
+                </ul>
             </div>
         </div>
+        <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="fab">
+            <i class="material-icons">add</i>
+        </button>
+
+        <script src="{{=URL('static', 'js/default_wheel.js')}}"></script>
+
         {{pass}}

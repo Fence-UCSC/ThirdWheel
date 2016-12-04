@@ -17,7 +17,7 @@ def get_wheel_list():
 # newer_than is the last time the client received an update of this wheel
 def get_wheel():
     wheel=request.vars.get('wheel')
-    newer_than=request.vars.get('newer_than')
+    newer_than=request.vars.get('newer_than') if 'newer_than' in request.vars else datetime.datetime.fromtimestamp(0)
     if wheel == None or newer_than == None:
         response.status=400
         return response.json({"error": "wheel and newer_than must not be null"})
