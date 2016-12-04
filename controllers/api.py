@@ -1,3 +1,4 @@
+import datetime
 
 # Parameters: [wheel_count=<integer>]
 # wheel_count is the index of the last wheel retrieved from the total list
@@ -11,16 +12,32 @@ def get_wheel_list():
         has_more_wheels=False
     return response.json({"wheels":wheels, "has_more_wheels":has_more_wheels, "next_count":next_count})
     
-# Parameters: wheel=<integer>
+# Parameters: wheel=wheel.id, newer_than=<datetime>
+# wheel is the id of the wheel to check updates for
+# newer_than is the last time the client received an update of this wheel
+def get_wheel():
+    wheel=request.vars.get('wheel')
+    newer_than=request.vars.get('newer_than') if 'newer_than' in request.vars else datetime.datetime.fromtimestamp(0)
+    if wheel == None or newer_than == None:
+        response.status=400
+        return response.json({"error": "wheel and newer_than must not be null"})
+    wheel_row=db.wheel(wheel)
+    if wheel_row.edited_time > datetime.datetime.strptime(newer_than, "%Y-%m-%d %H:%M:%S"):
+        return response.json(wheel_row)
+    else:
+        return response.json({"message":"nothing to update"})
+    
+# Parameters: wheel=<integer>, [newer_than=<datetime>]
 # wheel is the id of the wheel to retrieve suggestions for
-@auth.requires_signature()
+# newer_than specifies a time that the suggestions returned should be newer than
 def get_suggestions():
     wheel=request.vars.get('wheel')
+    newer_than=datetime.datetime.strptime(request.vars.get('newer_than') if 'newer_than' in request.vars else '1970-01-01 00:00:00', "%Y-%m-%d %H:%M:%S")
     if wheel == None:
         response.status=400
         return response.json({"error": "wheel of suggestions is required"})
     wheel_id=int(wheel)
-    suggestions=db(db.suggestion.wheel == wheel_id).select(orderby=~db.suggestion.creation_time)
+    suggestions=db(db.suggestion.wheel == wheel_id and db.suggestion.update_time > newer_than).select(orderby=~db.suggestion.creation_time)
     return response.json(suggestions)
 
 # Parameters: name=<string>, [description=<string>]
@@ -40,6 +57,7 @@ def add_wheel():
 # wheel is the wheel to be edited
 # name, if provided, will give the specified wheel a new name
 # description, if provided, will give the specified wheel a new description
+
 @auth.requires_signature()
 def edit_wheel():
     wheel=request.vars.get('wheel')
@@ -55,6 +73,7 @@ def edit_wheel():
         db.wheel(wheel).update_record(name=name)
     if description != None:
         db.wheel(wheel).update_record(description=description)
+    db.wheel(wheel).update_record(edited_time=datetime.datetime.utcnow())
     return response.json(db.wheel(wheel))
     
 # Parameters: wheel=wheel.id
@@ -103,6 +122,7 @@ def edit_suggestion():
         db.suggestion(suggestion).update_record(name=name)
     if description != None:
         db.suggestion(suggestion).update_record(description=description)
+    db.suggestion(suggestion).update_record(update_time=datetime.datetime.utcnow())
     return response.json(db.suggestion(suggestion))
     
 # Parameters: suggestion=suggestion.id
@@ -154,7 +174,7 @@ def vote():
             return response.json({"message":"this vote would exceed the number of allocatable points"})
         vote.update_record(points_allocated=new_points)
     suggestion_entity = db.suggestion(suggestion)
-    suggestion_entity.update_record(point_value=suggestion_entity.point_value+points)
+    suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, edited_on=datetime.datetime.utcnow())
     return response.json(suggestion_entity)
         
         

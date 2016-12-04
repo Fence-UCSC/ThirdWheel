@@ -76,6 +76,54 @@ var app = function() {
     //-----------------------add a wheel-----------------------------
 
 
+
+    //-----------------------edit a wheel----------------------------
+    function get_edit_urls(wheel_id) {
+        var pp = {
+            wheel: wheel_id,
+        };
+        return edit_wheel_url + "?" + $.param(pp);
+    }
+
+    self.edit_wheel_button = function (wheel_id, name, description) {
+        // The button to edit a post has been pressed.
+        self.vue.form_name = name;
+        self.vue.current_wheel_id = wheel_id;
+        self.vue.form_description = description;
+        if(self.vue.current_user != '') {
+            self.vue.is_editing_wheel = !self.vue.is_editing_wheel;
+        }
+    };
+
+    self.cancel_edit_button = function (wheel_id) {
+        // The button to edit a post has been pressed.
+        self.vue.current_wheel_id = wheel_id;
+        if(self.vue.current_user != '') {
+            self.vue.is_editing_wheel = !self.vue.is_editing_wheel;
+            self.vue.form_name = '';
+            self.vue.form_description = '';
+        }
+    };
+
+    self.edit_wheel = function(wheel_id) {
+        $.post(edit_wheel_url,
+            {
+                wheel: wheel_id,
+                name: self.vue.form_name,
+                description: self.vue.form_description,
+            },
+            function (data) {
+                $.web2py.enableElement($(".wheel-edit-button"));
+                //self.vue.posts.unshift(data.post);
+                self.get_wheels();
+                self.vue.form_name = '';
+                self.vue.form_description = '';
+            });
+        self.vue.is_editing_wheel = false;
+    };
+    //-----------------------edit a wheel----------------------------
+
+
     //-----------------------delete a wheel--------------------------
     self.delete_wheel = function(wheel_id) {
         $.post(del_wheel_url,
@@ -111,6 +159,12 @@ var app = function() {
         window.location.href = url;
     };
 
+    self.goto_profile_url = function(creator_id){
+        var url = 'profile/';
+        url += creator_id;
+        window.location.href = url;
+    };
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -120,6 +174,7 @@ var app = function() {
             wheels: [],
             has_more: false,
             is_adding_wheel: false,
+            is_editing_wheel: false,
             logged_in: false,
             current_user: null,
             current_wheel_id: null,
@@ -135,8 +190,12 @@ var app = function() {
             add_wheel_button: self.add_wheel_button,
             cancel_add_button: self.cancel_add_button,
             add_wheel: self.add_wheel,
+            edit_wheel_button: self.edit_wheel_button,
+            cancel_edit_button: self.cancel_edit_button,
+            edit_wheel: self.edit_wheel,
             delete_wheel: self.delete_wheel,
             goto_wheel_url: self.goto_wheel_url,
+            goto_profile_url: self.goto_profile_url,
         }
 
     });
