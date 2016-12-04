@@ -145,6 +145,7 @@ var app = function() {
                 }
             }
         )
+        self.get_wheels();
     };
     //-----------------------delete a wheel--------------------------
 
