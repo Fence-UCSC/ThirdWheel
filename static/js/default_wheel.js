@@ -4,47 +4,53 @@ var app = function() {
 
     var self = {};
     var earliest_time = '1970-01-01 00:00:00';
+    var refresh_ms = 5000;
 
     Vue.config.silent = false; // show all warnings
 
     self.get_wheel = function () {
-        console.log('get_wheel()');
+        var newer_than = (self.vue.wheel ? self.vue.wheel.edited_time.toString() : earliest_time);
+        console.log('get_wheel(' + wheel_id + " ," + newer_than + ')');
         $.post(get_wheel_url,
             {
                 wheel: wheel_id,
-                newer_than: (self.vue.wheel ? self.vue.wheel.edited_on : earliest_time)
+                newer_than: newer_than
             }, function (data) {
                 if(! data.message) {
-                    console.log('wheel data updated')
+                    console.log('  Wheel data updated')
                     self.vue.wheel = data;
                 }
                 self.get_suggestions();
+                setTimeout(function() { self.vue.get_wheel() }, refresh_ms);
             }
         );
     };
 
     self.get_suggestions = function() {
-        console.log('get_suggestions()');
+        console.log('get_suggestions(' + wheel_id + ', ' + self.vue.suggestions_updated + ')');
         $.post(get_suggestions_url,
             {
                 wheel: wheel_id,
-                newer_than: earliest_time
+                newer_than: self.vue.suggestions_updated
             }, function (data) {
-                for(var updated in data) {
-                    var suggestion = self.vue.suggestions.find(
+                var recentmost = 0;
+                data.forEach(function(updated) {
+                    var idx = self.vue.suggestions.findIndex(
                         function(elem){ return elem.id == updated.id }
                         );
-                    if(suggestion) {
-                        console.log("Updated suggestion " + suggestion.id)
-                        suggestion.name = updated.name;
-                        suggestion.description = updated.description;
-                        suggestion.update_time = updated.description;
-                        suggestion.point_value = updated.point_value;
+                    if(idx != -1) {
+                        console.log("  Updated suggestion " + self.vue.suggestions[idx].id)
+                        self.vue.suggestions[idx].name = updated.name;
+                        self.vue.suggestions[idx].description = updated.description;
+                        self.vue.suggestions[idx].update_time = updated.description;
+                        self.vue.suggestions[idx].point_value = updated.point_value;
                     } else {
-                        console.log("Added suggestion " + suggestion.id);
-                        self.vue.suggestions.append(updated);
+                        console.log("  Added suggestion " + updated.id);
+                        self.vue.suggestions.push(updated);
                     }
-                }
+                    if(updated.update_time > self.vue.suggestions_updated)
+                        self.vue.suggestions_updated = updated.update_time;
+                });
             });
     }
 
@@ -62,10 +68,9 @@ var app = function() {
             get_wheel: self.get_wheel,
             get_suggestions: self.get_suggestions
         }
-
     });
 
-    self.get_wheel();
+    self.vue.get_wheel();
     $('#vue-div').show();
 
     return self;
