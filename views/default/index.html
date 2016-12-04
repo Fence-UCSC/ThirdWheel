@@ -6,6 +6,7 @@
 <script>
     var get_wheels_url = "{{=URL('homepage_api', 'get_wheels')}}";
     var add_wheel_url = "{{=URL('homepage_api', 'add_wheel', user_signature=True)}}";
+    var edit_wheel_url = "{{=URL('api', 'edit_wheel', user_signature=True)}}";
     var del_wheel_url = "{{=URL('homepage_api', 'del_wheel', user_signature=True)}}";
 </script>
 {{end}}
@@ -16,7 +17,7 @@
         <!-- add wheel -->
          <div class="button_bar">
             <!-- Colored raised add post button -->
-            <button v-if="!is_adding_wheel" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" v-on:click="add_wheel_button()" v-bind:class="{'disabled': !logged_in}">
+            <button v-if="!is_adding_wheel" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" v-on:click="cancel_add_button()" v-bind:class="{'disabled': !logged_in}">
             Add new wheel
             </button>
             <!-- Raised delete button -->
@@ -76,15 +77,36 @@
 
                 <div v-for="wheel in wheels" class="post-content">
                     <li class="mdl-list__item mdl-list__item--three-line">
-                    <span class="mdl-list__item-primary-content">
-                        <a class="wheel_link" v-on:click="goto_wheel_url(wheel.id)">${wheel.name}</a>
-                        <span class="secondary_item_even">By: ${wheel.creator_name}</span>
-                        <span class="secondary_item_odd">Phase: ${wheel.phase}</span>
-                        <span class="secondary_item_even">Created On: ${wheel.creation_time}</span>
-                        <span class="secondary_item_odd">Chosen one: ${wheel.chosen_one}</span>
-                        <span class="mdl-list__item-text-body">${wheel.description}</span>
-                    </span>
+                    <div class="mdl-list__item-primary-content">
+
+
+                        <div v-if="!is_editing_wheel || wheel.id != current_wheel_id" class="wheel-content-not-editing">
+                            <a class="wheel_link" v-on:click="goto_wheel_url(wheel.id)">${wheel.name}</a>
+                            <a class="profile_link" v-on:click="goto_profile_url(wheel.creator_id)">${wheel.creator_name}</a>
+                            <span class="secondary_item_odd">Phase: ${wheel.phase}</span>
+                            <span class="secondary_item_even">Created On: ${wheel.creation_time}</span>
+                            <span class="secondary_item_odd">Chosen one: ${wheel.chosen_one}</span>
+                            <span class="mdl-list__item-text-body">${wheel.description}</span>
+                        </div>
+                        <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="wheel-content-editing">
+                            <textarea v-model="form_name">${wheel.name}</textarea>
+                        </div>
+                        <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="wheel-content-editing">
+                            <textarea v-model="form_description">${wheel.description}</textarea>
+                        </div>
+                        <div class="wheel-edit-div">
+                            <button v-if="is_editing_wheel && wheel.id == current_wheel_id" class="wheel-edit-button" v-on:click="edit_wheel(wheel.id)">
+                                Edit
+                            </button>
+                            <button v-if="is_editing_wheel && wheel.id == current_wheel_id" class="cancel-button" v-on:click="cancel_edit_button(wheel.id)">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
                     <span class="mdl-list__item-secondary-content">
+                        <div v-if="wheel.creator_name == current_user && !is_editing_wheel" class="mdl-list__item-secondary-action">
+                            <i class="mdl-button mdl-js-button" v-on:click="edit_wheel_button(wheel.id, wheel.name, wheel.description)">Edit</i>
+                        </div>
                         <div v-if="wheel.creator_name == current_user" class="mdl-list__item-secondary-action">
                             <i class="mdl-button mdl-js-button" v-on:click="delete_wheel(wheel.id)">Delete</i>
                         </div>

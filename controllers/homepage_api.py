@@ -57,7 +57,10 @@ def get_wheels():
 @auth.requires_signature()
 def add_wheel():
     """Here you get a new post and add it.  Return what you want."""
-    # Implement me!
+    namex = request.vars.name
+    if namex == '':
+        response.status=400
+        return response.json({"error": "name must not be null"})
     t_id = db.wheel.insert(
         creator_id=auth.user.email,
         name=request.vars.name,
@@ -65,6 +68,14 @@ def add_wheel():
     )
     t = db.wheel(t_id)
     return response.json(dict(wheel=t))
+
+@auth.requires_signature()
+def edit_wheel():
+    wheel_id = request.vars.wheel_id if request.vars.wheel_id is not None else 0
+    wheel = db(db.wheel.id == wheel_id).select().first()
+    wheel.name = request.vars.name
+    wheel.update_record()
+    return response.json(dict(wheel=wheel))
 
 @auth.requires_signature()
 def del_wheel():
