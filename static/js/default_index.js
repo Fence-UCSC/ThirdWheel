@@ -98,6 +98,10 @@ var app = function() {
     };
     //-----------------------delete a wheel--------------------------
 
+    self.goto_wheel_page = function(){
+
+    };
+
 
     // Complete as needed.
     self.vue = new Vue({
