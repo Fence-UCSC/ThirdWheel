@@ -26,4 +26,22 @@
     margin-left:10px;
 }
 
+#too_long {
+    overflow: auto;
+    width: 650px;
+}
+
+#too_long_name {
+    overflow: auto;
+    width: 650px;
+}
+
+.wheel-edit-div {
+    margin-bottom:1px;
+    width: 100px;
+}
+
+
+
+
 

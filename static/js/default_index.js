@@ -145,12 +145,9 @@ var app = function() {
                 }
             }
         )
+        self.get_wheels();
     };
     //-----------------------delete a wheel--------------------------
-
-    self.goto_wheel_page = function(){
-
-    };
 
 
     self.goto_wheel_url = function(wheel_id){

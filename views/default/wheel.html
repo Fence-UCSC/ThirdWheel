@@ -25,7 +25,10 @@
                 z-index: 10;
                 overflow: visible;
             }
-            #editor {
+            .wheelr .mdl-textfield {
+                width: 100%
+            }
+            #editor, #adder {
                 display: none;
             }
             #mycanvas {
@@ -91,8 +94,8 @@
                 </div>
             </div>
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
-                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="card-fab"
-                onclick='$(".edit-toggle").toggle()'>
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+                        id="card-fab" onclick='$(".edit-toggle").toggle()'>
                     <i class="material-icons">edit</i>
                 </button>
                 <div class="mdl-card__title">
@@ -113,8 +116,37 @@
                     </canvas>
                 </div>
             </div>
+            <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col add-toggle" id="adder">
+                <form>
+                    <div class="mdl-card__title">
+                        <h2 class="mdl-card__title-text">Add a suggestion</h2>
+                    </div>
+                    <div class="mdl-card__supporting-text">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input class="mdl-textfield__input" type="text">
+                            <label class="mdl-textfield__label" for="add-input-name">Title</label>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <textarea class="mdl-textfield__input" type="text" rows= "3">
+                            </textarea>
+                            <label class="mdl-textfield__label" for="add-input-description">Description</label>
+                        </div>
+                    </div>
+                    <div class="mdl-card__actions mdl-card--border">
+                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                          Add
+                        </button>
+                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                        type="button" onclick='$(".add-toggle").toggle()'>
+                          Cancel
+                        </button>
+                    </div>
+                </form>
+
+            </div>
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col">
-                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="card-fab">
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored
+                add-toggle" id="card-fab" onclick='$(".add-toggle").toggle()'>
                     <i class="material-icons">add</i>
                 </button>
                 <div class="mdl-card__title">

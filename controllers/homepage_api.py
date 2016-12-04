@@ -31,10 +31,11 @@ def get_wheels():
                 chosen_one_string = 'N/A'
             else:
                 chosen_one_string = 'placeholder'
+            creator_name = db(db.auth_user.id == r.creator_id).select().first().email
             t = dict(
                 id=r.id,
-                creator_id=auth.user_id,
-                creator_name=r.creator_id,
+                creator_id=r.creator_id,
+                creator_name=creator_name,
                 name=r.name,
                 description=r.description,
                 creation_time=r.creation_time,
@@ -62,7 +63,7 @@ def add_wheel():
         response.status=400
         return response.json({"error": "name must not be null"})
     t_id = db.wheel.insert(
-        creator_id=auth.user.email,
+        creator_id=auth.user_id,
         name=request.vars.name,
         description=request.vars.description,
     )
