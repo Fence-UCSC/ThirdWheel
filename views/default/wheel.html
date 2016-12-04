@@ -12,6 +12,7 @@
     var get_wheel_url = "{{=URL('api', 'get_wheel')}}";
     var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
     var add_suggestion_url = "{{=URL('api', 'add_suggestion', user_signature=True)}}";
+    var vote_url = "{{=URL('api', 'vote', user_signature=True)}}";
 </script>
 {{end}}
 
@@ -108,6 +109,7 @@
                     <p>
                         ${wheel.description}
                     </p>
+                    points left = ${free_points}
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
                     <span class="mdl-chip mdl-chip--contact" v-on:click="goto_profile_url(wheel.creator_id)">
@@ -175,6 +177,12 @@
                     <h2 class="mdl-card__title-text">Suggestions</h2>
                 </div>
                 <ul class="mdl-list">
+                    <li v-if="suggestions.length == 0" class="mdl-list__item">
+                        <span class="mdl-list__item-primary-content">
+                            <i class="material-icons mdl-color-text--red mdl-list__item-icon">error</i>
+                            <i>No suggestions have been made</i>
+                        </span>
+                    </li>
                     <li v-for="suggestion in suggestions" class="mdl-list__item mdl-list__item--three-line">
                         <span class="mdl-list__item-primary-content">
                             <i class="material-icons mdl-list__item-icon">label</i>
@@ -189,7 +197,20 @@
                                 ${suggestion.description}
                             </span>
                         </span>
-                        <span class="mdl-list__item-secondary-content">
+                        <span class="mdl-list__item-secondary-action">
+                            {{if auth.user_id is not None:}}
+                            <span v-if="wheel.phase != 'view'">
+                                <button class="mdl-button mdl-js-button mdl-button--icon"
+                                        v-on:click='vote(suggestion.id, -1)'>
+                                    <i class="material-icons">remove</i>
+                                </button>
+                                ${suggestion.user_points}
+                                <button class="mdl-button mdl-js-button mdl-button--icon"
+                                        v-on:click='vote(suggestion.id, 1)'>
+                                    <i class="material-icons">add</i>
+                                </button>
+                            </span>
+                                {{pass}}
                             ${suggestion.point_value}
                         </span>
                     </li>

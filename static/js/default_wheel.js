@@ -44,9 +44,10 @@ var app = function() {
                         console.log("  Updated suggestion " + self.vue.suggestions[idx].id)
                         self.vue.suggestions[idx].name = updated.name;
                         self.vue.suggestions[idx].description = updated.description;
+                        self.vue.suggestions[idx].creator_name = updated.creator_name;
                         self.vue.suggestions[idx].update_time = updated.description;
                         self.vue.suggestions[idx].point_value = updated.point_value;
-                        if(user_id) self.vue.suggestions[idx].point_user = updated.point_user;
+                        if(user_id) self.vue.suggestions[idx].user_points = updated.user_points;
                     } else {
                         console.log("  Added suggestion " + updated.id);
                         self.vue.suggestions.push(updated);
@@ -71,9 +72,40 @@ var app = function() {
                 });
                 buildWheelfromList(true);
                 predeterminedSpin();
+                self.sort_suggestions();
             }
         );
     };
+
+    self.sort_suggestions = function() {
+        self.vue.suggestions.sort(function(a, b) {
+            if(a.point_value == b.point_value) {
+                if(a.name < b.name) {
+                    return -1;
+                } else if(a.name == b.name) {
+                    return 0;
+                } else return 1;
+            } else if(a.point_value < b.point_value) {
+                return 1;
+            } else return -1;
+        });
+        self.update_points();
+    }
+
+    self.update_points = function() {
+        console.log('update_points()');
+        if(self.vue.wheel.phase == "view") {
+            console.log('  Error: in view phase');
+        } else if(user_id == 0) {
+            console.log('  Not logged in');
+        } else {
+            var points = total_points;
+            self.vue.suggestions.forEach(function (elem) {
+                points -= Math.abs(elem.user_points);
+            });
+            self.vue.free_points = points;
+        }
+    }
 
     self.add_suggestion = function() {
         console.log('add_suggestion(' + wheel_id + ', '
@@ -89,7 +121,8 @@ var app = function() {
                     wheel: wheel_id,
                     name: self.vue.adder_name,
                     description: self.vue.adder_description
-                }, function () {
+                }, function (data) {
+                    self.vue.suggestions.push(data);
                     self.adder_button();
                 }
             );
@@ -112,11 +145,14 @@ var app = function() {
         } else {
                 $.post(vote_url,
                 {
-                    wheel: wheel_id,
-                    name: self.vue.adder_name,
-                    description: self.vue.adder_description
+                    suggestion: id,
+                    points_to_allocate: points
                 }, function () {
-                    self.adder_button();
+                    var idx = self.vue.suggestions.findIndex(
+                        function(elem){ return elem.id == id }
+                        );
+                    self.vue.suggestions[idx].user_points = points;
+                    self.sort_suggestions();
                 }
             );
         }
@@ -138,14 +174,18 @@ var app = function() {
             suggestions: [],
             suggestions_updated: earliest_time,
             adder_name: null,
-            adder_description: null
+            adder_description: null,
+            free_points: total_points
         },
         methods: {
             get_wheel: self.get_wheel,
             get_suggestions: self.get_suggestions,
             add_suggestion: self.add_suggestion,
             adder_button: self.adder_button,
-            goto_profile_url: self.goto_profile_url
+            goto_profile_url: self.goto_profile_url,
+            vote: self.vote,
+            sort_suggestions: self.sort_suggestions,
+            update_points: self.update_points
         }
     });
 
