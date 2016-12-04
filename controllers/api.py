@@ -59,7 +59,7 @@ def edit_wheel():
     
 # Parameters: wheel=wheel.id
 # wheel is the wheel to delete
-@auth.requres_signature()
+@auth.requires_signature()
 def del_wheel():
     wheel=request.vars.get('wheel')
     if wheel == None:
@@ -107,7 +107,7 @@ def edit_suggestion():
     
 # Parameters: suggestion=suggestion.id
 # wheel is the wheel to delete
-@auth.requres_signature()
+@auth.requires_signature()
 def del_suggestion():
     suggestion=request.vars.get('suggestion')
     if suggestion == None:
