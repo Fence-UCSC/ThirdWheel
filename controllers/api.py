@@ -165,7 +165,7 @@ def vote():
         return response.json({"error":"suggestion and points_to_allocate must not be null"})
     points=int(points_string)
     suggestion_entity = db.suggestion(suggestion)
-    if db.wheel(suggestion_entity).phase == 'view':
+    if db.wheel(suggestion_entity.wheel).phase == 'view':
         response.status=403
         return response.json({"error":"this wheel is past its voting phase"})
     vote_query=db((db.vote.voter == auth.user_id) & (db.vote.suggestion == suggestion))
