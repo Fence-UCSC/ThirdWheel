@@ -83,7 +83,7 @@
                 <div v-for="wheel in wheels" class="post-content">
                     <li class="mdl-list__item mdl-list__item--three-line">
                     <span class="mdl-list__item-primary-content">
-                        <span>${wheel.name}</span>
+                        <a v-on:click="goto_wheel_url(wheel.id)">${wheel.name}</a>
                         <span>By: ${wheel.creator_id}</span>
                         <span>Phase: ${wheel.phase}</span>
                         <span>Created On: ${wheel.creation_time}</span>
