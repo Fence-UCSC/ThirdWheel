@@ -1,3 +1,63 @@
 {{extend 'layout.html'}}
 
-{{=form if form is not None else ''}}
+        <style>
+            .wheelr {
+                max-width: 1000px;
+                margin: auto;
+            }
+            .wheelr .mdl-card {
+                margin: 5px;
+            }
+            #editor {
+                display: none;
+            }
+        </style>
+
+        {{if args == "new":}}
+        <div class="mdl-grid wheelr">
+            <div class="mdl-card mdl-shadow--2dp mdl-cell--12-col">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Start a wheel</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    {{=form}}
+                </div>
+            </div>
+        </div>
+
+        {{else:}}
+        <div class="mdl-grid wheelr">
+            <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle" id="editor">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Edit wheel info</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    {{=form}}
+                </div>
+            </div>
+            <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">{{=wheel.name}}</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    {{=wheel.description}}
+                </div>
+            </div>
+            <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Placeholder for wheel spinner</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    Put the spinner here
+                </div>
+            </div>
+            <div class="mdl-card mdl-shadow--2dp mdl-cell--12-col">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Placeholder for suggestions</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    Put suggestions list here
+                </div>
+            </div>
+        </div>
+        {{pass}}
