@@ -59,9 +59,10 @@ var app = function() {
 
     self.add_wheel_button = function () {
         // The button to add a post has been pressed.
-        if(self.vue.current_user != '') {
-            self.vue.is_adding_wheel = !self.vue.is_adding_wheel;
-        }
+        window.location.href = 'wheel';
+        //if(self.vue.current_user != '') {
+          //  self.vue.is_adding_post = !self.vue.is_adding_post;
+        //}
     };
 
     self.cancel_add_button = function () {
@@ -99,6 +100,12 @@ var app = function() {
     //-----------------------delete a wheel--------------------------
 
 
+    self.goto_wheel_url = function(wheel_id){
+        var url = 'wheel/';
+        url += wheel_id;
+        window.location.href = url;
+    };
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -124,6 +131,7 @@ var app = function() {
             cancel_add_button: self.cancel_add_button,
             add_wheel: self.add_wheel,
             delete_wheel: self.delete_wheel,
+            goto_wheel_url: self.goto_wheel_url,
         }
 
     });
