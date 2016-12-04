@@ -59,10 +59,10 @@ var app = function() {
 
     self.add_wheel_button = function () {
         // The button to add a post has been pressed.
-        window.location.href = 'wheel';
-        //if(self.vue.current_user != '') {
-          //  self.vue.is_adding_post = !self.vue.is_adding_post;
-        //}
+        //window.location.href = 'wheel';
+        if(self.vue.current_user != '') {
+           self.vue.is_adding_wheel = !self.vue.is_adding_wheel;
+        }
     };
 
     self.cancel_add_button = function () {
@@ -70,6 +70,7 @@ var app = function() {
         if(self.vue.current_user != '') {
             self.vue.is_adding_wheel = !self.vue.is_adding_wheel;
             self.vue.form_name = '';
+            self.vue.form_description = '';
         }
     };
     //-----------------------add a wheel-----------------------------

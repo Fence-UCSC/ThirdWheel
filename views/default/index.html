@@ -1,14 +1,14 @@
 {{extend 'layout.html'}}
 
 {{block head}}
+<link rel="stylesheet" type="text/css" href="static/css/homepage.css" media="screen" />
 <script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
-    var get_wheels_url = "{{=URL('api', 'get_wheels')}}";
-    var add_wheel_url = "{{=URL('api', 'add_wheel', user_signature=True)}}";
-    var del_wheel_url = "{{=URL('api', 'del_wheel', user_signature=True)}}";
+    var get_wheels_url = "{{=URL('homepage_api', 'get_wheels')}}";
+    var add_wheel_url = "{{=URL('homepage_api', 'add_wheel', user_signature=True)}}";
+    var del_wheel_url = "{{=URL('homepage_api', 'del_wheel', user_signature=True)}}";
 </script>
 {{end}}
-
 
 <div class="main_content">
 
@@ -35,7 +35,7 @@
                     </div>
 
                     <div id="form_div1">
-                        <input class="form-control string" id="no_table_wheel" name="desc" type="text" v-model="form_description" placeholder="Description"/>
+                        <input class="form-control string" id="no_table_wheel1" name="desc" type="text" v-model="form_description" placeholder="Description"/>
                         <span class="help-block"></span>
                     </div>
 
@@ -72,36 +72,26 @@
         <!-- view wheels -->
         <div class="result_table">
 
-
-
-
-
-
-
                 <ul class="demo-list-three mdl-list">
 
                 <div v-for="wheel in wheels" class="post-content">
                     <li class="mdl-list__item mdl-list__item--three-line">
                     <span class="mdl-list__item-primary-content">
-                        <a v-on:click="goto_wheel_url(wheel.id)">${wheel.name}</a>
-                        <span>By: ${wheel.creator_id}</span>
-                        <span>Phase: ${wheel.phase}</span>
-                        <span>Created On: ${wheel.creation_time}</span>
-                        <span>Chosen one: ${wheel.chosen_one}</span>
+                        <a class="wheel_link" v-on:click="goto_wheel_url(wheel.id)">${wheel.name}</a>
+                        <span class="secondary_item_even">By: ${wheel.creator_name}</span>
+                        <span class="secondary_item_odd">Phase: ${wheel.phase}</span>
+                        <span class="secondary_item_even">Created On: ${wheel.creation_time}</span>
+                        <span class="secondary_item_odd">Chosen one: ${wheel.chosen_one}</span>
                         <span class="mdl-list__item-text-body">${wheel.description}</span>
                     </span>
                     <span class="mdl-list__item-secondary-content">
-                        <div v-if="wheel.creator_id == current_user" class="mdl-list__item-secondary-action">
+                        <div v-if="wheel.creator_name == current_user" class="mdl-list__item-secondary-action">
                             <i class="mdl-button mdl-js-button" v-on:click="delete_wheel(wheel.id)">Delete</i>
                         </div>
                     </span>
                      </li>
                 </div>
                 </ul>
-
-
-
-
 
             <div v-if="has_more" class="show_more">
                 <!-- Colored FAB load more button -->
@@ -115,6 +105,7 @@
      </div>
 
 </div>
+
 
 <script src="{{=URL('static', 'js/default_index.js')}}"></script>
 

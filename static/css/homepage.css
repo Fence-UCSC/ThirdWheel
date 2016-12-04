@@ -1,0 +1,23 @@
+.wheel_link {
+    font-size: 1.3em;
+    color: blue;
+}
+
+.secondary_item_even {
+    font-size: 0.8em;
+    margin-left: 5px;
+}
+
+.secondary_item_odd {
+    font-size: 0.8em;
+    margin-left: 5px;
+}
+
+#no_table_wheel {
+    margin-top: 10px;
+}
+
+.form-horizontal {
+    margin-left:10px;
+}
+
