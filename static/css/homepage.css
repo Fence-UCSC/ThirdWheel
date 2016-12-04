@@ -37,7 +37,8 @@
 }
 
 .wheel-edit-div {
-    overflow: visible;
+    margin-bottom:1px;
+    width: 100px;
 }
 
 

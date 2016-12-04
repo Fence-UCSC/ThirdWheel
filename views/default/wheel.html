@@ -4,13 +4,12 @@
 <link rel="stylesheet" type="text/css" href="static/css/homepage.css" media="screen" />
 <script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
-    var wheel_id = {{=args}};
+    var wheel_id = "{{=args}}";
     var get_wheel_url = "{{=URL('api', 'get_wheel')}}";
     var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
     var add_suggestion_url = "{{=URL('api', 'add_suggestion', user_signature=True)}}";
 </script>
 {{end}}
-
 
         <script src="{{=URL('static', 'js/Winwheel.js')}}"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
@@ -178,6 +177,11 @@
         //get from api
         var chosen_one_sugg_id;
 
+        chosen_one_sugg_id = 4;
+        TESTPopulateSuggestionsList();
+        buildWheelfromList(true);
+        predeterminedSpin();
+
     function TESTPopulateSuggestionsList()
     {
         SuggestionsList.push([1, "bob1", "1tunak tunak1", "cool dance moves", null, 5]);
@@ -276,11 +280,6 @@
         console.log(winner);
         theWheel.draw();
     }
-
-    chosen_one_sugg_id = 4;
-    TESTPopulateSuggestionsList();
-    buildWheelfromList(true);
-    predeterminedSpin();
 
         </script>
 
