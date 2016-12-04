@@ -156,9 +156,22 @@
                     <h2 class="mdl-card__title-text">Placeholder for suggestions</h2>
                 </div>
                 <ul class="mdl-list">
-                    <li v-for="suggestion in suggestions" class="mdl-list__item">
+                    <li v-for="suggestion in suggestions" class="mdl-list__item mdl-list__item--two-line">
                         <span class="mdl-list__item-primary-content">
-                              <span>${suggestion.name}</span>
+                            <i class="material-icons mdl-list__item-icon">label</i>
+                            <span>${suggestion.name}</span>
+                            <span class="mdl-list__item-sub-title">
+                                <button type="button" class="mdl-chip mdl-chip--contact" v-on:click="goto_profile_url(suggestion.creator_id)">
+                                    <i class="mdl-chip__contact material-icons">person</i>
+                                    <span class="mdl-chip__text">
+                                        ${suggestion.creator_name}
+                                    </span>
+                                </button>
+                                ${suggestion.description}
+                            </span>
+                        </span>
+                        <span class="mdl-list__item-secondary-content">
+                            ${suggestion.point_value}
                         </span>
                     </li>
                 </ul>

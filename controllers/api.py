@@ -38,6 +38,8 @@ def get_suggestions():
         return response.json({"error": "wheel of suggestions is required"})
     wheel_id=int(wheel)
     suggestions=db(db.suggestion.wheel == wheel_id and db.suggestion.update_time > newer_than).select(orderby=~db.suggestion.creation_time)
+    for suggestion in suggestions:
+        suggestion.creator_name = id_to_name(suggestion.creator_id)
     return response.json(suggestions)
 
 # Parameters: name=<string>, [description=<string>]

@@ -1,14 +1,5 @@
 # These are the controllers for your ajax api.
 
-def get_user_name_from_email(email):
-    """Returns a string corresponding to the user first and last names,
-    given the user email."""
-    u = db(db.auth_user.email == email).select().first()
-    if u is None:
-        return 'None'
-    else:
-        return ' '.join([u.first_name, u.last_name])
-
 def get_wheels():
     """This controller is used to get the posts.  Follow what we did in lecture 10, to ensure
     that the first time, we get 4 posts max, and each time the "load more" button is pressed,

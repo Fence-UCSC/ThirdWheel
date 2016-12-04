@@ -33,7 +33,7 @@ var app = function() {
                 wheel: wheel_id,
                 newer_than: self.vue.suggestions_updated
             }, function (data) {
-                var recentmost = 0;
+                var suggestions_time = Date.parse(self.vue.suggestions_updated);
                 data.forEach(function(updated) {
                     var idx = self.vue.suggestions.findIndex(
                         function(elem){ return elem.id == updated.id }
@@ -48,8 +48,23 @@ var app = function() {
                         console.log("  Added suggestion " + updated.id);
                         self.vue.suggestions.push(updated);
                     }
-                    if(updated.update_time > self.vue.suggestions_updated)
+                    var updated_time = Date.parse(updated.update_time);
+                    if(updated_time > suggestions_time) {
+                        console.log("  Set suggestion " + updated.id + " time " + updated.update_time + " to latest.");
+                        suggestions_time = updated_time + 1;
                         self.vue.suggestions_updated = updated.update_time;
+                    }
+                });
+                self.vue.suggestions.sort(function(a, b) {
+                    if(a.point_value == b.point_value) {
+                        if(a.name < b.name) {
+                            return -1;
+                        } else if(a.name == b.name) {
+                            return 0;
+                        } else return 1;
+                    } else if(a.point_value < b.point_value) {
+                        return 1;
+                    } else return -1;
                 });
             }
         );
@@ -81,6 +96,12 @@ var app = function() {
         self.vue.adder_description = '';
     };
 
+    self.goto_profile_url = function(creator_id){
+        var url = '../profile/';
+        url += creator_id;
+        window.location.href = url;
+    };
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -97,7 +118,8 @@ var app = function() {
             get_wheel: self.get_wheel,
             get_suggestions: self.get_suggestions,
             add_suggestion: self.add_suggestion,
-            adder_button: self.adder_button
+            adder_button: self.adder_button,
+            goto_profile_url: self.goto_profile_url
         }
     });
 

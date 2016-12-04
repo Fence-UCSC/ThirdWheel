@@ -38,3 +38,33 @@ db.wheel.chosen_one.writable = db.wheel.chosen_one.readable = False
 
 db.suggestion.creator_id.writable = db.suggestion.creator_id.readable = False
 db.suggestion.creation_time.writable = db.suggestion.creation_time.readable = False
+
+# Global functions go here
+
+
+def email_to_name(email):
+    """Returns a string corresponding to the user first and last names,
+    given the user email."""
+    u = db(db.auth_user.email == email).select().first()
+    if u is None:
+        return 'None'
+    else:
+        return ' '.join([u.first_name, u.last_name])
+
+def id_to_name(id):
+    """Returns a string corresponding to the user first and last names,
+    given the user id."""
+    u = db(db.auth_user.id == id).select().first()
+    if u is None:
+        return 'None'
+    else:
+        return ' '.join([u.first_name, u.last_name])
+
+def id_to_profile(id):
+    """Returns a string corresponding to the user profile image URL,
+        given the user id."""
+    u = db(db.auth_user.id == id).select().first()
+    if u is None:
+        return 'None'
+    else:
+        return ' '.join([u.first_name, u.last_name])
