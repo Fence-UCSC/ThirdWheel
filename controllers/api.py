@@ -37,8 +37,7 @@ def get_suggestions():
     if wheel == None:
         response.status=400
         return response.json({"error": "wheel of suggestions is required"})
-    wheel_id=int(wheel)
-    suggestions=db(db.suggestion.wheel == wheel_id and db.suggestion.update_time > newer_than).select(orderby=~db.suggestion.creation_time)
+    suggestions=db((db.suggestion.wheel == wheel) & (db.suggestion.update_time > newer_than)).select(orderby=~db.suggestion.creation_time)
     for suggestion in suggestions:
         suggestion.creator_name = id_to_name(suggestion.creator_id)
     return response.json(suggestions)
@@ -162,7 +161,7 @@ def vote():
         response.status=400
         return response.json({"error":"suggestion and points_to_allocate must not be null"})
     points=int(points_string)
-    vote_query=db(db.vote.voter == auth.user_id and db.vote.suggestion == suggestion)
+    vote_query=db((db.vote.voter == auth.user_id) & (db.vote.suggestion == suggestion))
     if vote_query.count() == 0:
         # user has not previously voted on this suggestion
         if sum_points_for_user(auth.user_id, suggestion)+abs(points) > 10:
