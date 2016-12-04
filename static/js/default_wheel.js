@@ -44,6 +44,7 @@ var app = function() {
                         self.vue.suggestions[idx].description = updated.description;
                         self.vue.suggestions[idx].update_time = updated.description;
                         self.vue.suggestions[idx].point_value = updated.point_value;
+                        if(user_id) self.vue.suggestions[idx].point_user = updated.point_user;
                     } else {
                         console.log("  Added suggestion " + updated.id);
                         self.vue.suggestions.push(updated);
@@ -97,6 +98,25 @@ var app = function() {
         self.vue.adder_name = '';
         self.vue.adder_description = '';
     };
+
+    self.vote = function(id, points) {
+        console.log('vote(' + id + ', ' + points + ')');
+        if(self.vue.wheel.phase == "view") {
+            console.log('  Error: in view phase');
+        } else if (! id || id <= 0 || ! points) {
+            console.log('  Error: no title given');
+        } else {
+                $.post(vote_url,
+                {
+                    wheel: wheel_id,
+                    name: self.vue.adder_name,
+                    description: self.vue.adder_description
+                }, function () {
+                    self.adder_button();
+                }
+            );
+        }
+    }
 
     self.goto_profile_url = function(creator_id){
         var url = '../profile/';
