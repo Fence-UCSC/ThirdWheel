@@ -52,6 +52,16 @@ def wheel():
         redirect(URL('default','wheel',args=form.vars.id))
 
     return dict(form=form,args=args,wheel=wheelr)
+    
+def profile():
+    user_id=request.args(0)
+    user=db.auth_user(user_id)
+    name=user.first_name+' '+user.last_name
+    wheels=db(db.wheel.creator_id == user_id).select()
+    suggestions=db(db.suggestion.creator_id == user_id).select()
+    profile=db(db.profile.profile_user == user_id)
+    bio=profile.select().first().biography if profile.count() > 0 else 'This user has not yet added a Bio'
+    return dict(name=name, wheels=wheels, suggestions=suggestions, bio=bio)
 
 def user():
     """

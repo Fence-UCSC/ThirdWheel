@@ -1,0 +1,29 @@
+{{extend 'layout.html'}}
+
+<link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css" />
+
+<div>
+    <h2>{{=name}}</h2>
+    <h3>Bio</h3>
+    <div>{{=bio}}</div>
+    {{if len(wheels) > 0:}}
+    <h3>List of Created Wheels</h3>
+    <table>
+        {{for wheel in wheels:}}
+        <tr>
+            <td><a href="{{=URL('default', 'wheel')}}/{{=wheel.id}}">{{=wheel.name}}</a></td>
+        </tr>
+        {{pass}}
+    </table>
+    {{pass}}
+    {{if len(suggestions) > 0:}}
+    <h3>List of Suggestions</h3>
+    <table>
+        {{for suggestion in suggestions:}}
+        <tr>
+            <td><a href="{{=URL('default', 'wheel')}}/{{=suggestion.wheel}}">{{=suggestion.name}}</a></td>
+        <tr>
+        {{pass}}
+    </table>
+    {{pass}}
+</div>
