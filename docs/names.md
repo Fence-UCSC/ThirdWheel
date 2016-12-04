@@ -7,3 +7,4 @@ List of proposed names for the project
 * Wheel of Choosing (WoC)
 * Wheelr
 * SpinBot
+* Shit just got wheel

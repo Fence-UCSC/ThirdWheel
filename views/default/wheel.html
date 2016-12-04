@@ -7,9 +7,13 @@
     var wheel_id = {{=args}};
     var get_wheel_url = "{{=URL('api', 'get_wheel')}}";
     var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
+    var add_suggestion_url = "{{=URL('api', 'add_suggestion')}}";
 </script>
 {{end}}
 
+
+        <script src="{{=URL('static', 'js/Winwheel.js')}}"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
 
         <style>
             .wheelr {
@@ -18,15 +22,46 @@
                 z-index: 10;
             }
             .wheelr .mdl-card {
-                margin: 5px;
+                margin: 33px;
+                z-index: 10;
+                overflow: visible;
             }
             #editor {
                 display: none;
             }
-            #fab {
+            #mycanvas {
+                width: 95%;
+                height: auto;
+                margin: auto;
+                z-index: 1;
+            }
+            canvas {
+                display: flex;
+            }
+            #pointer {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                left: 0;
+                right: 0;
+                top: 0;
+                z-index: 99;
+            }
+            #wheeldiv {
+                margin-top: 0;
+            }
+            #bottom-fab {
                 bottom: 25px;
                 right: 25px;
                 position: fixed;
+                z-index: 20;
+            }
+            #card-fab {
+                position: absolute;
+                top: 0;
+                right: 28px;
+                -webkit-transform: translate(0px, -28px);
+                transform: translate(0px, -28px);
                 z-index: 20;
             }
             #vue-div {
@@ -36,11 +71,11 @@
 
         {{if args == "new":}}
         <div class="mdl-grid wheelr">
-            <div class="mdl-card mdl-shadow--2dp mdl-cell--12-col">
+            <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col">
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Start a wheel</h2>
                 </div>
-                <div class="mdl-card__supporting-text">
+                <div class="mdl-cell mdl-card__supporting-text">
                     {{=form}}
                 </div>
             </div>
@@ -48,7 +83,7 @@
 
         {{else:}}
         <div class="mdl-grid wheelr" id="vue-div">
-            <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle" id="editor">
+            <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col edit-toggle" id="editor">
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Edit wheel info</h2>
                 </div>
@@ -56,7 +91,11 @@
                     {{=form}}
                 </div>
             </div>
-            <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
+            <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="card-fab"
+                onclick='$(".edit-toggle").toggle()'>
+                    <i class="material-icons">edit</i>
+                </button>
                 <div class="mdl-card__title">
                     <h2 v-if="wheel && wheel.name" class="mdl-card__title-text">${wheel.name}</h2>
                 </div>
@@ -64,15 +103,21 @@
                     ${wheel.description}
                 </div>
             </div>
-            <div class="mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
+            <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Placeholder for wheel spinner</h2>
                 </div>
-                <div class="mdl-card__supporting-text">
-                    Put the spinner here
+                <div id="wheeldiv">
+                    <img id = "pointer" src = "{{=URL('static', 'images/choose_arrow.png')}}"/>
+                    <canvas id='mycanvas' height='300'>
+                        Canvas not supported, use another browser.
+                    </canvas>
                 </div>
             </div>
-            <div class="mdl-card mdl-shadow--2dp mdl-cell--12-col">
+            <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col">
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="card-fab">
+                    <i class="material-icons">add</i>
+                </button>
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Placeholder for suggestions</h2>
                 </div>
@@ -85,10 +130,127 @@
                 </ul>
             </div>
         </div>
-        <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="fab">
-            <i class="material-icons">add</i>
-        </button>
 
         <script src="{{=URL('static', 'js/default_wheel.js')}}"></script>
 
         {{pass}}
+
+        <script>
+        var SuggestionsList = new Array();
+        var TotalPoints = 0;
+        var theWheel;
+        var chosen_angle;
+        //get from api
+        var chosen_one_sugg_id;
+
+    function TESTPopulateSuggestionsList()
+    {
+        SuggestionsList.push([1, "bob1", "1tunak tunak1", "cool dance moves", null, 5]);
+        SuggestionsList.push([2, "bob2", "2tunak tunak2", "cool dance moves2", null, 5]);
+        SuggestionsList.push([3, "bob3", "3tunak tunak3", "cool dance moves3", null, 3]);
+        SuggestionsList.push([4, "bob4", "4tunak tunak4", "cool dance moves4", null, 2]);
+        SuggestionsList.push([5, "bob5", "5tunak tunak5", "cool dance moves5", null, 0]);
+        SuggestionsList.push([6, "bob6", "6tunak tunak6", "cool dance moves6", null, -10]);
+        TotalPoints = 15;
+    }
+
+    function addtoSuggestionsList(Id, creator, name, description, timestamps, pointvalue)
+    {
+        var Suggestion = [Id, creator, name, description, timestamps, pointvalue];
+        SuggestionsList.push(Suggestion);
+        buildWheelfromList(false);
+    }
+
+    function adjustPointValueforSegment(Id, pointsadded) {
+        SuggestionsList.forEach(function(e) {
+            if (e[0] == Id) {
+                e[5] += pointsadded;
+                buildWheelfromList(false);
+            }
+        });
+    }
+
+    function buildWheelfromList(isViewPhase) {
+         theWheel = new Winwheel({
+             'canvasId'    : 'mycanvas',
+             'lineWidth'   : 1,
+             'animation'   :
+                     {
+                         'type'     : 'spinToStop',
+                         'duration' : 1,
+                         'spins'    : 2,
+                         'callbackFinished' : 'afterSpin()'
+                     }
+        });
+        TotalPoints = 0;
+        iter = 0;
+        SuggestionsList.forEach(function(e) {
+            if (e[5] > 0) {
+                TotalPoints += e[5];
+            }
+        });
+        SuggestionsList.forEach(function(e) {
+            if (e[5] > 0) {
+                segSize = 360 * (e[5] / TotalPoints);
+                addSegmenttoWheel(e[2], segSize);
+                tmpEndSeg = iter + segSize;
+                if (isViewPhase == true && chosen_one_sugg_id == e[0]) {
+                    chosen_angle = Math.random() * ((tmpEndSeg-1) - (iter+1)) + (iter+1);
+                    console.log("e[0]:");
+                    console.log(e[0]);
+                    console.log("iter");
+                    console.log(iter);
+                }
+                iter = tmpEndSeg;
+            }
+        });
+        //This addsegment is to ensure no gray space, creates 0 sized slice
+        theWheel.addSegment();
+        theWheel.draw();
+    }
+
+    function addSegmenttoWheel(text, size)
+    {
+        var newSegment = theWheel.addSegment();
+        newSegment.text = text;
+        newSegment.fillStyle = "#f8f8f8";
+        newSegment.size = size;
+    }
+
+    function chooser()
+    {
+        return Math.floor(Math.random() * 360);
+    }
+
+    function predeterminedSpin() {
+        theWheel.animation.stopAngle = chosen_angle;
+        console.log("chosen_angle:");
+        console.log(chosen_angle);
+        theWheel.startAnimation();
+    }
+
+    function afterSpin() {
+        var winner = theWheel.getIndicatedSegmentNumber();
+        for (var x = 1; x < theWheel.segments.length; x ++)
+        {
+            theWheel.segments[x].fillStyle = 'gray';
+            console.log(theWheel.segments[x].text);
+        }
+        theWheel.segments[winner].fillStyle = '#f8f8f8';
+        console.log("winner seg number:");
+        console.log(winner);
+        theWheel.draw();
+    }
+
+    chosen_one_sugg_id = 4;
+    TESTPopulateSuggestionsList();
+    buildWheelfromList(true);
+    predeterminedSpin();
+
+        </script>
+
+        <button onClick="predeterminedSpin()">Spin</button>
+        <button onClick="winwheelStopAnimation();buildWheelfromList(true);">Reset</button>
+        <button onClick="addtoSuggestionsList(99, 'bob', 'doug dimmadome', 'dimmsdale dimmadome', null, 1)">Add a Segment</button>
+        <button onClick="adjustPointValueforSegment(1, 1)">Upvote 1 by 1</button>
+        <button onClick="adjustPointValueforSegment(1, -2)">Downvoate 1 by 2</button>
