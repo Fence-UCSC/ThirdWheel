@@ -26,11 +26,6 @@ db.define_table('vote',
                 Field('suggestion', 'reference suggestion', required=True)
                 )
                 
-db.define_table('profile',
-                Field('profile_user', default=auth.user_id),
-                Field('biography', 'text')
-                )
-                
 db.wheel.creator_id.writable = db.wheel.creator_id.readable = False
 db.wheel.creation_time.writable = db.wheel.creation_time.readable = False
 db.wheel.edited_time.writable = db.wheel.edited_time.readable = False
