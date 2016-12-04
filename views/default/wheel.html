@@ -93,16 +93,28 @@
                     {{=form}}
                 </div>
             </div>
-            <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
+            <div v-if="wheel" class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
                 <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
                         id="card-fab" onclick='$(".edit-toggle").toggle()'>
                     <i class="material-icons">edit</i>
                 </button>
                 <div class="mdl-card__title">
-                    <h2 v-if="wheel && wheel.name" class="mdl-card__title-text">${wheel.name}</h2>
+                    <h2 class="mdl-card__title-text">${wheel.name}</h2>
                 </div>
-                <div v-if="wheel && wheel.description" class="mdl-card__supporting-text">
-                    ${wheel.description}
+                <div class="mdl-card__supporting-text">
+                    <p>
+                        ${wheel.description}
+                    </p>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <span class="mdl-chip mdl-chip--contact" v-on:click="goto_profile_url(wheel.creator_id)">
+                        <i class="mdl-chip__contact material-icons">person</i>
+                        <span class="mdl-chip__text">${wheel.creator_name}</span>
+                    </span>
+                    <span class="mdl-chip mdl-chip--contact">
+                        <i class="mdl-chip__contact material-icons">access_time</i>
+                        <span class="mdl-chip__text">${wheel.creation_time}</span>
+                    </span>
                 </div>
             </div>
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
@@ -153,14 +165,14 @@
                     <i class="material-icons">add</i>
                 </button>
                 <div class="mdl-card__title">
-                    <h2 class="mdl-card__title-text">Placeholder for suggestions</h2>
+                    <h2 class="mdl-card__title-text">Suggestions</h2>
                 </div>
                 <ul class="mdl-list">
-                    <li v-for="suggestion in suggestions" class="mdl-list__item mdl-list__item--two-line">
+                    <li v-for="suggestion in suggestions" class="mdl-list__item mdl-list__item--three-line">
                         <span class="mdl-list__item-primary-content">
                             <i class="material-icons mdl-list__item-icon">label</i>
                             <span>${suggestion.name}</span>
-                            <span class="mdl-list__item-sub-title">
+                            <span class="mdl-list__item-text-body">
                                 <button type="button" class="mdl-chip mdl-chip--contact" v-on:click="goto_profile_url(suggestion.creator_id)">
                                     <i class="mdl-chip__contact material-icons">person</i>
                                     <span class="mdl-chip__text">

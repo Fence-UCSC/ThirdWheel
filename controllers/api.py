@@ -23,6 +23,7 @@ def get_wheel():
         return response.json({"error": "wheel and newer_than must not be null"})
     wheel_row=db.wheel(wheel)
     if wheel_row.edited_time > datetime.datetime.strptime(newer_than, "%Y-%m-%d %H:%M:%S"):
+        wheel_row.creator_name = id_to_name(wheel_row.creator_id)
         return response.json(wheel_row)
     else:
         return response.json({"message":"nothing to update"})

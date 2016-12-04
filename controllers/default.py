@@ -48,6 +48,10 @@ def wheel():
 
     # Form acceptance
     if form and form.process().accepted:
+        wheelr = db.wheel(form.vars.id)
+        wheelr.updated_time = datetime.datetime.now()
+        wheelr.update()
+
         session.flash = T("Wheel updated")
         redirect(URL('default','wheel',args=form.vars.id))
 
