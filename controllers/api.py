@@ -180,4 +180,22 @@ def vote():
     suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, edited_on=datetime.datetime.utcnow())
     return response.json(suggestion_entity)
         
-        
+# Parameters: wheel=wheel.id, chosen_one=suggestion.id
+# wheel is the wheel to select a resultant suggestion for
+# chosen_one is the wheel's winning suggestion
+@auth.requires_signature
+def choose_winner():
+    wheel_id=request.vars.get('wheel')
+    chosen_one=request.vars.get('chosen_one')
+    if wheel_id == None or chosen_one == None:
+        response.status=400
+        return response.json({"error":"wheel and chosen_one must not be null"})
+    wheel=db.wheel(wheel_id)
+    if wheel.creator_id != auth.user_id:
+        response.status=403
+        return response.json({"error":"This user is not the creator of the wheel"})
+    if wheel.phase == 'view':
+        response.status=403
+        return response.json({"error":"A winner has already been chosen for this wheel"})
+    wheel.update_record(phase="view", edited_time=datetime.datetime.utcnow(), chosen_one=chosen_one)
+    return response.json(wheel)
