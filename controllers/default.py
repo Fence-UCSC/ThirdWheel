@@ -62,13 +62,17 @@ def wheel():
     return dict(form=form,args=args,wheel=wheelr,total_points=total_points)
     
 def profile():
-    user_id=request.args(0)
-    user=db.auth_user(user_id)
-    name=user.first_name+' '+user.last_name
-    wheels=db(db.wheel.creator_id == user_id).select(orderby=~db.wheel.creation_time)
-    suggestions=db(db.suggestion.creator_id == user_id).select()
-    bio=db.auth_user(user_id).bio
-    return dict(name=name, wheels=wheels, suggestions=suggestions, bio=bio)
+    if len(request.args) > 0:
+        user_id=request.args(0)
+        user=db.auth_user(user_id)
+        name=user.first_name+' '+user.last_name
+        wheels=db(db.wheel.creator_id == user_id).select(orderby=~db.wheel.creation_time)
+        suggestions=db(db.suggestion.creator_id == user_id).select()
+        bio=db.auth_user(user_id).bio
+        return dict(name=name, wheels=wheels, suggestions=suggestions, bio=bio)
+    else:
+        user_list=db().select(db.auth_user.ALL)
+        return dict(user_list=user_list)
 
 def user():
     """
