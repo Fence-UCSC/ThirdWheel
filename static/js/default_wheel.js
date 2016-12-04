@@ -51,7 +51,20 @@ var app = function() {
                     if(updated.update_time > self.vue.suggestions_updated)
                         self.vue.suggestions_updated = updated.update_time;
                 });
-            });
+            }
+        );
+    }
+
+    self.add_suggestion = function() {
+        $.post(add_suggestion_url,
+            {
+                wheel: wheel_id,
+                name: name,
+                description: description
+            }, function () {
+                // Clear form
+            }
+        );
     }
 
     // Complete as needed.
@@ -66,7 +79,8 @@ var app = function() {
         },
         methods: {
             get_wheel: self.get_wheel,
-            get_suggestions: self.get_suggestions
+            get_suggestions: self.get_suggestions,
+            add_suggestion: self.add_suggestion
         }
     });
 
