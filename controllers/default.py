@@ -67,7 +67,7 @@ def profile():
         user=db.auth_user(user_id)
         name=user.first_name+' '+user.last_name
         wheels=db(db.wheel.creator_id == user_id).select(orderby=~db.wheel.creation_time)
-        suggestions=db(db.suggestion.creator_id == user_id).select()
+        suggestions=db(db.suggestion.creator_id == user_id).select(orderby=~db.suggestion.creation_time)
         bio=db.auth_user(user_id).bio
         return dict(name=name, wheels=wheels, suggestions=suggestions, bio=bio)
     else:
