@@ -164,6 +164,10 @@ def vote():
         response.status=400
         return response.json({"error":"suggestion and points_to_allocate must not be null"})
     points=int(points_string)
+    suggestion_entity = db.suggestion(suggestion)
+    if db.wheel(suggestion_entity.wheel).phase == 'view':
+        response.status=403
+        return response.json({"error":"this wheel is past its voting phase"})
     vote_query=db((db.vote.voter == auth.user_id) & (db.vote.suggestion == suggestion))
     if vote_query.count() == 0:
         # user has not previously voted on this suggestion
@@ -178,7 +182,6 @@ def vote():
         if sum_points_for_user(auth.user_id, suggestion)+net_change_in_points_allocated > 10:
             return response.json({"message":"this vote would exceed the number of allocatable points"})
         vote.update_record(points_allocated=new_points)
-    suggestion_entity = db.suggestion(suggestion)
     suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, edited_on=datetime.datetime.utcnow())
     return response.json(suggestion_entity)
         
