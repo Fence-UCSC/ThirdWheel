@@ -40,6 +40,9 @@ def get_suggestions():
     suggestions=db((db.suggestion.wheel == wheel) & (db.suggestion.update_time > newer_than)).select(orderby=~db.suggestion.creation_time)
     for suggestion in suggestions:
         suggestion.creator_name = id_to_name(suggestion.creator_id)
+        if auth.user_id:
+            vote=db((db.vote.voter == auth.user_id) & (db.vote.suggestion == suggestion.id)).select(db.vote.points_allocated).first()
+            suggestion.user_points=vote.points_allocated if vote else 0
     return response.json(suggestions)
 
 # Parameters: name=<string>, [description=<string>]
