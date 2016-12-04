@@ -100,10 +100,10 @@
                             -->
                         </span>
                         <span class="mdl-list__item-secondary-content">
-                            <div v-if="wheel.creator_name == current_user && !is_editing_wheel" class="mdl-list__item-secondary-action">
+                            <div v-if="wheel.creator_email == current_user && !is_editing_wheel" class="mdl-list__item-secondary-action">
                                 <i class="mdl-button mdl-js-button" v-on:click="edit_wheel_button(wheel.id, wheel.name, wheel.description)">Edit</i>
                             </div>
-                            <div v-if="wheel.creator_name == current_user && !is_editing_wheel" class="mdl-list__item-secondary-action">
+                            <div v-if="wheel.creator_email == current_user && !is_editing_wheel" class="mdl-list__item-secondary-action">
                                 <i class="mdl-button mdl-js-button" v-on:click="delete_wheel(wheel.id)">Delete</i>
                             </div>
                             <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="wheel-edit-div">
