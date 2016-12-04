@@ -19,7 +19,7 @@ var app = function() {
                 newer_than: newer_than
             }, function (data) {
                 if(! data.message) {
-                    console.log('  Wheel data updated');
+                    console.log('  Updated wheel data')
                     self.vue.wheel = data;
                 }
                 self.get_suggestions();
@@ -46,6 +46,7 @@ var app = function() {
                         self.vue.suggestions[idx].description = updated.description;
                         self.vue.suggestions[idx].update_time = updated.description;
                         self.vue.suggestions[idx].point_value = updated.point_value;
+                        if(user_id) self.vue.suggestions[idx].point_user = updated.point_user;
                     } else {
                         console.log("  Added suggestion " + updated.id);
                         self.vue.suggestions.push(updated);
@@ -76,8 +77,13 @@ var app = function() {
 
     self.add_suggestion = function() {
         console.log('add_suggestion(' + wheel_id + ', '
-                + self.vue.adder_name + ', ' + self.vue.adder_description + ')');
-        if(self.vue.adder_name.length) {
+            + self.vue.adder_name + ', ' + self.vue.adder_description + ')');
+        if(self.vue.wheel.phase == "view") {
+            console.log('  Error: in view phase');
+        } else if (self.vue.adder_name.length == 0) {
+            console.log('  Error: no title given');
+            $("#adder-name-warn").show();
+        } else {
             $.post(add_suggestion_url,
                 {
                     wheel: wheel_id,
@@ -87,9 +93,6 @@ var app = function() {
                     self.adder_button();
                 }
             );
-        } else {
-            console.log('  No title given');
-            $("#adder-name-warn").show();
         }
     };
 
@@ -99,6 +102,25 @@ var app = function() {
         self.vue.adder_name = '';
         self.vue.adder_description = '';
     };
+
+    self.vote = function(id, points) {
+        console.log('vote(' + id + ', ' + points + ')');
+        if(self.vue.wheel.phase == "view") {
+            console.log('  Error: in view phase');
+        } else if (! id || id <= 0 || ! points) {
+            console.log('  Error: no title given');
+        } else {
+                $.post(vote_url,
+                {
+                    wheel: wheel_id,
+                    name: self.vue.adder_name,
+                    description: self.vue.adder_description
+                }, function () {
+                    self.adder_button();
+                }
+            );
+        }
+    }
 
     self.goto_profile_url = function(creator_id){
         var url = '../profile/';
@@ -123,7 +145,7 @@ var app = function() {
             get_suggestions: self.get_suggestions,
             add_suggestion: self.add_suggestion,
             adder_button: self.adder_button,
-            goto_profile_url: self.goto_profile_url,
+            goto_profile_url: self.goto_profile_url
         }
     });
 

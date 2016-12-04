@@ -24,6 +24,7 @@ def wheel():
     form = None
     args = request.args(0)
     wheelr = None
+    total_points = 10
 
     # Handle argument (page type)
     if args is None:
@@ -43,29 +44,35 @@ def wheel():
         if wheelr is None:
             session.flash = T('Wheel #' + args + ' does not exist')
             redirect(URL('default','index'))
-        form = SQLFORM(db.wheel, wheelr, deletable=True, showid=False)
-        form.add_button(T('Cancel'),URL('default','wheel',args=args),_class="btn btn-warning")
+        if wheelr.creator_id == auth.user_id:
+            form = SQLFORM(db.wheel, wheelr, deletable=True, showid=False)
+            form.add_button(T('Cancel'),URL('default','wheel',args=args),_class="btn btn-warning")
 
     # Form acceptance
     if form and form.process().accepted:
-        wheelr = db.wheel(form.vars.id)
-        wheelr.updated_time = datetime.datetime.now()
-        wheelr.update()
+        wheeld=db.wheel(form.vars.id)
+        if args != "new":
+            wheeld.update_record(edited_time=datetime.datetime.now())
+        else:
+            wheeld.update_record(edited_time=wheeld.creation_time)
 
         session.flash = T("Wheel updated")
         redirect(URL('default','wheel',args=form.vars.id))
 
-    return dict(form=form,args=args,wheel=wheelr)
+    return dict(form=form,args=args,wheel=wheelr,total_points=total_points)
     
 def profile():
-    user_id=request.args(0)
-    user=db.auth_user(user_id)
-    name=user.first_name+' '+user.last_name
-    wheels=db(db.wheel.creator_id == user_id).select(orderby=~db.wheel.creation_time)
-    suggestions=db(db.suggestion.creator_id == user_id).select()
-    profile=db(db.profile.profile_user == user_id)
-    bio=profile.select().first().biography if profile.count() > 0 else 'This user has not yet added a Bio'
-    return dict(name=name, wheels=wheels, suggestions=suggestions, bio=bio)
+    if len(request.args) > 0:
+        user_id=request.args(0)
+        user=db.auth_user(user_id)
+        name=user.first_name+' '+user.last_name
+        wheels=db(db.wheel.creator_id == user_id).select(orderby=~db.wheel.creation_time)
+        suggestions=db(db.suggestion.creator_id == user_id).select()
+        bio=db.auth_user(user_id).bio
+        return dict(name=name, wheels=wheels, suggestions=suggestions, bio=bio)
+    else:
+        user_list=db().select(db.auth_user.ALL)
+        return dict(user_list=user_list)
 
 def user():
     """

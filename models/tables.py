@@ -26,18 +26,17 @@ db.define_table('vote',
                 Field('suggestion', 'reference suggestion', required=True)
                 )
                 
-db.define_table('profile',
-                Field('profile_user', default=auth.user_id),
-                Field('biography', 'text')
-                )
-                
 db.wheel.creator_id.writable = db.wheel.creator_id.readable = False
 db.wheel.creation_time.writable = db.wheel.creation_time.readable = False
+db.wheel.edited_time.writable = db.wheel.edited_time.readable = False
 db.wheel.phase.writable = db.wheel.phase.readable = False
 db.wheel.chosen_one.writable = db.wheel.chosen_one.readable = False
 
+db.suggestion.wheel.writable = db.suggestion.wheel.readable = False
 db.suggestion.creator_id.writable = db.suggestion.creator_id.readable = False
 db.suggestion.creation_time.writable = db.suggestion.creation_time.readable = False
+db.suggestion.update_time.writable = db.suggestion.update_time.readable = False
+db.suggestion.point_value.writable = db.suggestion.point_value.readable = False
 
 # Global functions go here
 

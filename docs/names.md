@@ -3,6 +3,7 @@
 List of proposed names for the project
 
 * ChandlrWheelr (working name)
+* Master Plan (original proposal)
 * Wheel.io
 * Wheel of Choosing (WoC)
 * Wheelr

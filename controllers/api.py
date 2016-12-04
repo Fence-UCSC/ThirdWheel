@@ -37,10 +37,12 @@ def get_suggestions():
     if wheel == None:
         response.status=400
         return response.json({"error": "wheel of suggestions is required"})
-    wheel_id=int(wheel)
-    suggestions=db(db.suggestion.wheel == wheel_id and db.suggestion.update_time > newer_than).select(orderby=~db.suggestion.creation_time)
+    suggestions=db((db.suggestion.wheel == wheel) & (db.suggestion.update_time > newer_than)).select(orderby=~db.suggestion.creation_time)
     for suggestion in suggestions:
         suggestion.creator_name = id_to_name(suggestion.creator_id)
+        if auth.user_id:
+            vote=db((db.vote.voter == auth.user_id) & (db.vote.suggestion == suggestion.id)).select(db.vote.points_allocated).first()
+            suggestion.user_points=vote.points_allocated if vote else 0
     return response.json(suggestions)
 
 # Parameters: name=<string>, [description=<string>]
@@ -162,7 +164,7 @@ def vote():
         response.status=400
         return response.json({"error":"suggestion and points_to_allocate must not be null"})
     points=int(points_string)
-    vote_query=db(db.vote.voter == auth.user_id and db.vote.suggestion == suggestion)
+    vote_query=db((db.vote.voter == auth.user_id) & (db.vote.suggestion == suggestion))
     if vote_query.count() == 0:
         # user has not previously voted on this suggestion
         if sum_points_for_user(auth.user_id, suggestion)+abs(points) > 10:
@@ -180,4 +182,22 @@ def vote():
     suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, edited_on=datetime.datetime.utcnow())
     return response.json(suggestion_entity)
         
-        
+# Parameters: wheel=wheel.id, chosen_one=suggestion.id
+# wheel is the wheel to select a resultant suggestion for
+# chosen_one is the wheel's winning suggestion
+@auth.requires_signature
+def choose_winner():
+    wheel_id=request.vars.get('wheel')
+    chosen_one=request.vars.get('chosen_one')
+    if wheel_id == None or chosen_one == None:
+        response.status=400
+        return response.json({"error":"wheel and chosen_one must not be null"})
+    wheel=db.wheel(wheel_id)
+    if wheel.creator_id != auth.user_id:
+        response.status=403
+        return response.json({"error":"This user is not the creator of the wheel"})
+    if wheel.phase == 'view':
+        response.status=403
+        return response.json({"error":"A winner has already been chosen for this wheel"})
+    wheel.update_record(phase="view", edited_time=datetime.datetime.utcnow(), chosen_one=chosen_one)
+    return response.json(wheel)

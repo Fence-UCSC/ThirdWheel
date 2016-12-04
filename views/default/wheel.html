@@ -6,7 +6,9 @@
 <script src="{{=URL('static', 'js/Winwheel.js')}}"></script>
 <script src="{{=URL('static', 'js/TweenMax.min.js')}}"></script>
 <script>
-    var wheel_id = "{{=args}}";
+    var wheel_id = {{=args}};
+    var total_points = {{=total_points}};
+    var user_id = {{=auth.user_id if auth.user_id else 0}};
     var get_wheel_url = "{{=URL('api', 'get_wheel')}}";
     var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
     var add_suggestion_url = "{{=URL('api', 'add_suggestion', user_signature=True)}}";
@@ -93,10 +95,12 @@
                 </div>
             </div>
             <div v-if="wheel" class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
+                {{if int(wheel.creator_id) == auth.user_id:}}
                 <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
                         id="card-fab" onclick='$(".edit-toggle").toggle()'>
                     <i class="material-icons">edit</i>
                 </button>
+                {{pass}}
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">${wheel.name}</h2>
                 </div>
@@ -113,6 +117,10 @@
                     <span class="mdl-chip mdl-chip--contact">
                         <i class="mdl-chip__contact material-icons">access_time</i>
                         <span class="mdl-chip__text">${wheel.creation_time}</span>
+                    </span>
+                    <span v-if="wheel.creation_time != wheel.edited_time" class="mdl-chip mdl-chip--contact">
+                        <i class="mdl-chip__contact material-icons">mode_edit</i>
+                        <span class="mdl-chip__text">${wheel.edited_time}</span>
                     </span>
                 </div>
             </div>
