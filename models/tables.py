@@ -8,7 +8,7 @@ db.define_table('wheel',
                 Field('phase', default='create'),
                 Field('chosen_one', 'integer', default=-1)
                 )
-
+                
 db.define_table('suggestion',
                 Field('wheel', 'reference wheel', required=True),
                 Field('creator_id', default=auth.user_id),
@@ -16,6 +16,12 @@ db.define_table('suggestion',
                 Field('description', 'text'),
                 Field('creation_time', 'datetime', default=datetime.datetime.utcnow()),
                 Field('point_value', 'integer', default=0)
+                )
+
+db.define_table('vote',
+                Field('voter', default=auth.user_id),
+                Field('points_allocated', 'integer', required=True),
+                Field('suggestion', 'reference suggestion', required=True)
                 )
                 
 db.wheel.creator_id.writable = db.wheel.creator_id.readable = False
