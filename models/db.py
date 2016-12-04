@@ -193,8 +193,8 @@ class googleAccount(OAuthAccount):
                     last_name=uinfo['family_name'],
                     username=uinfo['id'],
                     email=uinfo['email'],
-                    picture=uinfo['picture'],
-                    gender=uinfo['gender']
+                    picture=uinfo['picture'] if 'picture' in uinfo else None,
+                    gender=uinfo['gender'] if 'gender' in uinfo else None
                     )
 
 auth.settings.login_form = googleAccount()
