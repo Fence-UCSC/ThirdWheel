@@ -118,10 +118,13 @@ def del_suggestion():
 # Helper function for vote()
 def sum_points_for_user(user_id, suggestion):
     wheel_id=db.suggestion(suggestion).wheel
-    query=db.vote.voter == user_id and db.suggestion.id == db.vote.suggestion and db.wheel.id == db.suggestion.wheel and db.wheel.id == wheel_id
-    votes_from_user = db(query).select(db.vote.points_allocated)
-    sum=0
+    votes_from_user = db(db.vote.voter == auth.user_id).select(db.vote.points_allocated, db.vote.suggestion)
+    votes_on_this_wheel=[]
     for vote in votes_from_user:
+        if db.suggestion(vote.suggestion).wheel == wheel_id:
+            votes_on_this_wheel.append(vote)
+    sum=0
+    for vote in votes_on_this_wheel:
         sum += abs(vote.points_allocated)
     return sum
     
