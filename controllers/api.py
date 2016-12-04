@@ -169,20 +169,24 @@ def vote():
         response.status=403
         return response.json({"error":"this wheel is past its voting phase"})
     vote_query=db((db.vote.voter == auth.user_id) & (db.vote.suggestion == suggestion))
+    vote_sum=sum_points_for_user(auth.user_id, suggestion)
     if vote_query.count() == 0:
         # user has not previously voted on this suggestion
-        if sum_points_for_user(auth.user_id, suggestion)+abs(points) > 10:
+        if vote_sum+abs(points) > 10:
             return response.json({"message":"this vote would exceed the number of allocatable points"})
         db.vote.insert(points_allocated=points, suggestion=suggestion)
+        vote_sum += points
     else:
         # user has previously voted on this suggestion
         vote=vote_query.select().first()
         new_points=vote.points_allocated+points
         net_change_in_points_allocated=abs(new_points)-abs(vote.points_allocated)
-        if sum_points_for_user(auth.user_id, suggestion)+net_change_in_points_allocated > 10:
+        if vote_sum+net_change_in_points_allocated > 10:
             return response.json({"message":"this vote would exceed the number of allocatable points"})
         vote.update_record(points_allocated=new_points)
+        vote_sum += net_change_in_points_allocated
     suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, edited_on=datetime.datetime.utcnow())
+    suggestion_entity.points_left_for_user=10-vote_sum
     return response.json(suggestion_entity)
         
 # Parameters: wheel=wheel.id, chosen_one=suggestion.id
