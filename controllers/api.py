@@ -1,74 +1,95 @@
-# These are the controllers for your ajax api.
 
-def get_user_name_from_email(email):
-    """Returns a string corresponding to the user first and last names,
-    given the user email."""
-    u = db(db.auth_user.email == email).select().first()
-    if u is None:
-        return 'None'
-    else:
-        return ' '.join([u.first_name, u.last_name])
+# Parameters: [wheel_count=<integer>]
+# wheel_count is the index of the last wheel retrieved from the total list
+# retrieves 10 wheels at a time
+def get_wheel_list():
+    wheel_count=int(request.vars.get('wheel_count')) if 'wheel_count' in request.vars else 0
+    next_count=wheel_count+10
+    wheels=db().select(db.wheel.ALL, orderby=~db.wheel.creation_time, limitby=(wheel_count,next_count))
+    has_more_wheels=True
+    if db(db.wheel).count() <= next_count:
+        has_more_wheels=False
+    return response.json({"wheels":wheels, "has_more_wheels":has_more_wheels, "next_count":next_count})
+    
+# Parameters: wheel=<integer>
+# wheel is the id of the wheel to retrieve suggestions for
+@auth.requires_signature()
+def get_suggestions():
+    wheel=request.vars.get('wheel')
+    if wheel == None:
+        response.status=400
+        return response.json({"error": "wheel of suggestions is required"})
+    wheel_id=int(wheel)
+    suggestions=db(db.suggestion.wheel == wheel_id).select(orderby=~db.suggestion.creation_time)
+    return response.json(suggestions)
 
-def get_wheels():
-    """This controller is used to get the posts.  Follow what we did in lecture 10, to ensure
-    that the first time, we get 4 posts max, and each time the "load more" button is pressed,
-    we load at most 4 more posts."""
-    # Implement me!
-    start_idx = int(request.vars.start_idx) if request.vars.start_idx is not None else 0
-    end_idx = int(request.vars.end_idx) if request.vars.end_idx is not None else 0
-
-    logged_in = auth.user_id is not None
-    wheels = []
-    has_more = False
-    current_user = ''
-    if auth.user_id is not None:
-        current_user = auth.user.email
-
-    rows = db().select(orderby=~db.wheel.id, limitby=(start_idx, end_idx + 1))
-    for i, r in enumerate(rows):
-        if i < end_idx - start_idx:
-            if r.chosen_one == -1:
-                chosen_one_string = 'N/A'
-            else:
-                chosen_one_string = 'placeholder'
-            t = dict(
-                id=r.id,
-                creator_id=r.creator_id,
-                name=r.name,
-                description=r.description,
-                creation_time=r.creation_time,
-                phase=r.phase,
-                chosen_one=chosen_one_string,
-            )
-            wheels.append(t)
-        else:
-            has_more = True
-
-    return response.json(dict(
-        wheels=wheels,
-        logged_in=logged_in,
-        has_more=has_more,
-        current_user=current_user,
-    ))
-
-
-# Note that we need the URL to be signed, as this changes the db.
+# Parameters: name=<string>, [description=<string>]
+# name is the new name of this wheel
+# description is the new description of this wheel
 @auth.requires_signature()
 def add_wheel():
-    """Here you get a new post and add it.  Return what you want."""
-    # Implement me!
-    t_id = db.wheel.insert(
-        creator_id=auth.user.email,
-        name=request.vars.name,
-        description=request.vars.description,
-    )
-    t = db.wheel(t_id)
-    return response.json(dict(wheel=t))
-
+    name=request.vars.get('name')
+    description=request.vars.get('description')
+    if name == None:
+        response.status=400
+        return response.json({"error": "name must not be null"})
+    id=db.wheel.insert(name=name, description=description)
+    return response.json(db.wheel(id))
+    
+# Parameters: wheel=wheel.id, name=<string>, [description=<string>]
+# wheel is the id of the wheel this suggestion belongs to
+# name is the new name of this suggestion
+# description is the new description of this suggestion
 @auth.requires_signature()
-def del_wheel():
-    """Used to delete a post."""
-    # Implement me!
-    db(db.wheel.id == request.vars.wheel_id).delete()
-    return "ok"
+def add_suggestion():
+    wheel_id=request.vars.get('wheel')
+    name=request.vars.get('name')
+    description=request.vars.get('description')
+    if wheel_id == None or name == None:
+        response.status=400
+        return response.json({"error":"name and wheel must not be null"})
+    if db.wheel(wheel_id).phase != 'create':
+        return response.json({"message":"This wheel is past its suggestion creation phase"})
+    id=db.suggestion.insert(wheel=wheel_id, name=name, description=description)
+    return response.json(db.suggestion(id))
 
+# Helper function for vote()
+def sum_points_for_user(user_id, suggestion):
+    wheel_id=db.suggestion(suggestion).wheel
+    query=db.vote.voter == user_id and db.suggestion.id == db.vote.suggestion and db.wheel.id == db.suggestion.wheel and db.wheel.id == wheel_id
+    votes_from_user = db(query).select(db.vote.points_allocated)
+    sum=0
+    for vote in votes_from_user:
+        sum += abs(vote.points_allocated)
+    return sum
+    
+# Parameters: suggestion=suggestion.id, points=<integer>
+# suggestion is the suggestion being voted on
+# points is the amount of points to be allocated to this suggestion
+@auth.requires_signature()
+def vote():
+    suggestion=request.vars.get('suggestion')
+    points_string=request.vars.get('points_to_allocate')
+    if suggestion == None or points_string == None:
+        response.status=400
+        return response.json({"error":"suggestion and points_to_allocate must not be null"})
+    points=int(points_string)
+    vote_query=db(db.vote.voter == auth.user_id and db.vote.suggestion == suggestion)
+    if vote_query.count() == 0:
+        # user has not previously voted on this suggestion
+        if sum_points_for_user(auth.user_id, suggestion)+abs(points) > 10:
+            return response.json({"message":"this vote would exceed the number of allocatable points"})
+        db.vote.insert(points_allocated=points, suggestion=suggestion)
+    else:
+        # user has previously voted on this suggestion
+        vote=vote_query.select().first()
+        new_points=vote.points_allocated+points
+        net_change_in_points_allocated=abs(new_points)-abs(vote.points_allocated)
+        if sum_points_for_user(auth.user_id, suggestion)+net_change_in_points_allocated > 10:
+            return response.json({"message":"this vote would exceed the number of allocatable points"})
+        vote.update_record(points_allocated=new_points)
+    suggestion_entity = db.suggestion(suggestion)
+    suggestion_entity.update_record(point_value=suggestion_entity.point_value+points)
+    return response.json(suggestion_entity)
+        
+        
