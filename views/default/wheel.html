@@ -96,7 +96,7 @@
                 </div>
             </div>
             <div v-if="wheel" class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
-                {{if wheel.creator_id == auth.user_id:}}
+                {{if int(wheel.creator_id) == auth.user_id:}}
                 <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
                         id="card-fab" onclick='$(".edit-toggle").toggle()'>
                     <i class="material-icons">edit</i>
