@@ -151,14 +151,15 @@ var app = function() {
 
 
     self.goto_wheel_url = function(wheel_id){
-        var url = 'wheel/';
-        url += wheel_id;
+        var url = prefix_wheel_url;
+        url += '/' + wheel_id;
         window.location.href = url;
     };
 
     self.goto_profile_url = function(creator_id){
-        var url = 'profile/';
-        url += creator_id;
+        console.log(prefix_profile_url);
+        var url = prefix_profile_url;
+        url += '/' + creator_id;
         window.location.href = url;
     };
 

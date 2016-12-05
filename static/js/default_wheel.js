@@ -223,8 +223,8 @@ var app = function() {
 
 
     self.goto_profile_url = function(creator_id){
-        var url = '../profile/';
-        url += creator_id;
+        var url = prefix_profile_url;
+        url += '/' + creator_id;
         window.location.href = url;
     };
 
