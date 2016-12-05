@@ -17,9 +17,12 @@
         <!-- add wheel -->
          <div class="button_bar">
             <!-- Colored raised add post button -->
-            <button v-if="!is_adding_wheel" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" v-on:click="cancel_add_button()" v-bind:class="{'disabled': !logged_in}">
-            Add new wheel
-            </button>
+            <div v-if="!is_adding_wheel">
+                <h2>Wheels</h2>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" v-on:click="cancel_add_button()" v-bind:class="{'disabled': !logged_in}">
+                    Add new wheel
+                </button>
+            </div>
             <!-- Raised delete button -->
             <button v-if="is_adding_wheel" class="mdl-button mdl-js-button mdl-button--raised" v-on:click="cancel_add_button()">
             Cancel
@@ -51,21 +54,6 @@
             </form>
 
 
-
-
-            <!--
-                <form action="#" v-on:submit.prevent="add_wheel" class="form-horizontal" enctype="multipart/form-data" method="post">
-                    <div class="mdl-textfield mdl-js-textfield" id="no_table_wheel_content__row">
-                        <input class="mdl-textfield__input" id="no_table_wheel" name="Content" type="text" v-model="form_name">
-                        <label class="mdl-textfield__label" for="no_table_wheel">wheel description</label>
-                    </div>
-
-                    <div>
-                        <input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" v-on:click="add_wheel_button()" id="add_wheel_submit" type="submit" value="Post" />
-                    </div>
-                </form>
-            -->
-
         </div>
         <!-- add wheel -->
 
@@ -73,21 +61,24 @@
         <!-- view wheels -->
 
 
-                <ul class="demo-list-three mdl-list">
-                    <li v-for="wheel in wheels" class="mdl-list__item mdl-list__item--three-line">
+                    <div id="list-container" v-for="wheel in wheels" class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col">
 
 
-                        <span v-if="!is_editing_wheel || wheel.id != current_wheel_id" class="mdl-list__item-primary-content">
-                            <div id="too_long_name">
-                                 <a class="wheel_link" v-on:click="goto_wheel_url(wheel.id)">${wheel.name}</a>
+                        <div id="too_long_name" v-if="!is_editing_wheel || wheel.id != current_wheel_id" class="mdl-card__title">
+                            <a class="wheel_link" v-on:click="goto_wheel_url(wheel.id)">${wheel.name}</a>
+                        </div>
+                        <div v-if="!is_editing_wheel || wheel.id != current_wheel_id" class="mdl-card__supporting-text">
+                            <div>
+                                <a class="profile_link" v-on:click="goto_profile_url(wheel.creator_id)">${wheel.creator_name}</a>
                             </div>
-                            <a class="profile_link" v-on:click="goto_profile_url(wheel.creator_id)">${wheel.creator_name}</a>
+                            <div id="too_long">
+                                <span class="mdl-list__item-text-body">${wheel.description}</span>
+                            </div>
                             <span class="secondary_item_odd">Phase: ${wheel.phase}</span>
                             <span class="secondary_item_even">Created On: ${wheel.creation_time}</span>
                             <span id="too_long_chosen" class="secondary_item_odd">Chosen: ${wheel.chosen_one}</span>
-                            <span id="too_long" class="mdl-list__item-text-body">${wheel.description}</span>
-                        </span>
-                        <span v-if="is_editing_wheel && wheel.id == current_wheel_id" class="mdl-list__item-primary-content">
+                        </div>
+                        <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="mdl-card__supporting-text">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" id="no_table_wheel_content__row">
                             <input class="mdl-textfield__input" id="no_table_wheel" name="Content" type="text" v-model="form_name">
                             </div>
@@ -98,27 +89,26 @@
                             <textarea v-model="form_name">${wheel.name}</textarea>
                             <textarea v-model="form_description">${wheel.description}</textarea>
                             -->
-                        </span>
-                        <span class="mdl-list__item-secondary-content">
-                            <div v-if="wheel.creator_email == current_user && !is_editing_wheel" class="mdl-list__item-secondary-action">
+                        </div>
+                        <span class="mdl-card__actions mdl-card--border">
+                            <div v-if="wheel.creator_email == current_user && !is_editing_wheel" class="mdl-chip__text">
                                 <i class="mdl-button mdl-js-button" v-on:click="edit_wheel_button(wheel.id, wheel.name, wheel.description)">Edit</i>
                             </div>
-                            <div v-if="wheel.creator_email == current_user && !is_editing_wheel" class="mdl-list__item-secondary-action">
+                            <div v-if="wheel.creator_email == current_user && !is_editing_wheel" class="mdl-chip__text">
                                 <i class="mdl-button mdl-js-button" v-on:click="delete_wheel(wheel.id)">Delete</i>
                             </div>
-                            <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="wheel-edit-div">
+                            <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="mdl-chip__text">
                                 <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" v-on:click="edit_wheel(wheel.id)">
                                     Confirm
                                 </button>
                             </div>
-                            <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="wheel-edit-div">
+                            <div v-if="is_editing_wheel && wheel.id == current_wheel_id" class="mdl-chip__text">
                                 <button class="mdl-button mdl-js-button mdl-button--raised" v-on:click="cancel_edit_button(wheel.id)">
                                     Cancel
                                 </button>
                             </div>
                         </span>
-                     </li>
-                </ul>
+                     </div>
 
             <div v-if="has_more" class="show_more">
                 <!-- Colored FAB load more button -->
