@@ -196,9 +196,11 @@
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text mdl-color-text--primary">Suggestions</h2>
                 </div>
-                <div class="mdl-card__supporting-text">
+                {{if auth.user_id:}}
+                <div v-if="wheel && wheel.phase != 'view'" class="mdl-card__supporting-text mdl-color--primary mdl-color-text--white">
                     You have <strong>${free_points}</strong> votes remaining
                 </div>
+                {{pass}}
                 <ul class="mdl-list">
                     <li v-if="suggestions.length == 0" class="mdl-list__item">
                         <span class="mdl-list__item-primary-content">
