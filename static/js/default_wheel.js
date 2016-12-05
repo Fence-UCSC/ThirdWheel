@@ -177,37 +177,29 @@ var app = function() {
 
 
     self.choose_winner = function() {
-        var newer_than = (self.vue.wheel ? self.vue.wheel.edited_time.toString() : earliest_time);
-        $.post(get_suggestions_url,
-            {
-                wheel: wheel_id,
-                newer_than: newer_than
-            }, function (data) {
-                ttlpts = 0;
-                data.forEach(function(e) {
-                    if(e.point_value > 0) {
-                        ttlpts += e.point_value;
-                    }
-                });
-                rnd = Math.floor(Math.random() * (ttlpts));
-                data.forEach(function(e) {
-                    if(e.point_value > 0) {
-                        ttlpts += e.point_value;
-                        if (rnd < ttlpts) {
-                            self.vue.wheel.chosen_one = e.id;
-                            $.post(choose_winner_url,
-                                {
-                                    wheel: self.vue.wheel.id,
-                                    chosen_one: e.id
-                                }, function (data) {
-
-                                }
-                            );
-                        }
-                    }
-                });
+        ttlpts = 0;
+        self.vue.suggestions.forEach(function(e) {
+            if(e.point_value > 0) {
+                ttlpts += e.point_value;
             }
-        );
+        });
+        rnd = Math.floor(Math.random() * (ttlpts));
+        self.vue.suggestions.forEach(function(e) {
+            if(e.point_value > 0) {
+                ttlpts += e.point_value;
+                if (rnd < ttlpts) {
+                    self.vue.wheel.chosen_one = e.id;
+                    $.post(choose_winner_url,
+                        {
+                            wheel: self.vue.wheel.id,
+                            chosen_one: e.id
+                        }, function (data) {
+
+                        }
+                    );
+                }
+            }
+        });
     };
 
 
