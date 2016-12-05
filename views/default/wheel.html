@@ -201,12 +201,14 @@
                             {{if auth.user_id is not None:}}
                             <span v-if="wheel.phase != 'view'">
                                 <button class="mdl-button mdl-js-button mdl-button--icon"
-                                        v-on:click='vote(suggestion.id, -1)'>
+                                        v-on:click='vote(suggestion.id, -1)'
+                                        v-bind:class="{'disabled': free_points < 1 && suggestion.user_points <= 0}">
                                     <i class="material-icons">remove</i>
                                 </button>
                                 ${suggestion.user_points}
                                 <button class="mdl-button mdl-js-button mdl-button--icon"
-                                        v-on:click='vote(suggestion.id, 1)'>
+                                        v-on:click='vote(suggestion.id, 1)'
+                                v-bind:class="{'disabled': free_points < 1 && suggestion.user_points >= 0}">
                                     <i class="material-icons">add</i>
                                 </button>
                             </span>

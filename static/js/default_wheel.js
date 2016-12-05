@@ -73,6 +73,7 @@ var app = function() {
                 buildWheelfromList(true);
                 predeterminedSpin();
                 self.sort_suggestions();
+                if(! self.vue.free_points_init) self.free_pointers();
             }
         );
     };
@@ -89,22 +90,14 @@ var app = function() {
                 return 1;
             } else return -1;
         });
-        self.update_points();
     }
 
-    self.update_points = function() {
-        console.log('update_points()');
-        if(self.vue.wheel.phase == "view") {
-            console.log('  Error: in view phase');
-        } else if(user_id == 0) {
-            console.log('  Not logged in');
-        } else {
-            var points = total_points;
-            self.vue.suggestions.forEach(function (elem) {
-                points -= Math.abs(elem.user_points);
-            });
-            self.vue.free_points = points;
-        }
+    self.free_pointers = function() {
+        var points = total_points;
+        self.vue.suggestions.forEach(function(elem) {
+            points -= Math.abs(elem.user_points);
+        });
+        self.vue.free_points = points;
     }
 
     self.add_suggestion = function() {
@@ -138,25 +131,34 @@ var app = function() {
 
     self.vote = function(id, points) {
         console.log('vote(' + id + ', ' + points + ')');
+        var idx = self.vue.suggestions.findIndex(
+            function(elem){ return elem.id == id }
+        );
         if(self.vue.wheel.phase == "view") {
             console.log('  Error: in view phase');
-        } else if (! id || id <= 0 || ! points) {
+        } else if(! id || id <= 0 || ! points) {
             console.log('  Error: no title given');
+        } else if(self.vue.free_points < 1
+            && (Math.abs(self.vue.suggestions[idx].user_points + points) > total_points)) {
+            console.log('  Error: vote would exceed free point allowance');
         } else {
                 $.post(vote_url,
-                {
-                    suggestion: id,
-                    points_to_allocate: points
-                }, function () {
-                    var idx = self.vue.suggestions.findIndex(
-                        function(elem){ return elem.id == id }
+                    {
+                        suggestion: id,
+                        points_to_allocate: points
+                    }, function (data) {
+                        var idx = self.vue.suggestions.findIndex(
+                            function(elem){ return elem.id == id }
                         );
-                    self.vue.suggestions[idx].user_points = points;
-                    self.sort_suggestions();
-                }
-            );
+                        self.vue.suggestions[idx].user_points += points;
+                        self.vue.suggestions[idx].point_value += points;
+                        self.vue.free_points = data.points_left_for_user;
+                        self.sort_suggestions();
+                    }
+                );
         }
     }
+
 
     self.goto_profile_url = function(creator_id){
         var url = '../profile/';
@@ -175,7 +177,8 @@ var app = function() {
             suggestions_updated: earliest_time,
             adder_name: null,
             adder_description: null,
-            free_points: total_points
+            free_points: total_points,
+            free_points_init: false
         },
         methods: {
             get_wheel: self.get_wheel,
@@ -185,7 +188,7 @@ var app = function() {
             goto_profile_url: self.goto_profile_url,
             vote: self.vote,
             sort_suggestions: self.sort_suggestions,
-            update_points: self.update_points
+            free_pointers: self.free_pointers
         }
     });
 
