@@ -3,6 +3,7 @@
 var theWheel;
 var clicked_segment_id;
 var clickedSegment;
+var AugustValera = true;
 
 var app = function() {
 
@@ -74,12 +75,13 @@ var app = function() {
                 });
                 if (self.vue.wheel.phase == 'create') {
                     buildWheelfromList(false);
-                    reDrawSelected();
-                    chooseWinner();
                 } else {
-                    buildWheelfromList(true);
-                    chosen_one_sugg_id = self.vue.wheel.chosen_one;
-                    predeterminedSpin();
+                    if (AugustValera) {
+                        buildWheelfromList(true);
+                        chosen_one_sugg_id = self.vue.wheel.chosen_one;
+                        predeterminedSpin();
+                        AugustValera = false;
+                    }
                 }
                 self.sort_suggestions();
                 if(! self.vue.free_points_init) self.free_pointers();
@@ -279,7 +281,17 @@ var app = function() {
 
 
         function buildWheelfromList(isViewPhase) {
-         theWheel = new Winwheel({
+        TotalPoints = 0;
+        iter = 0;
+        self.vue.suggestions.forEach(function(e) {
+            if (e.point_value > 0) {
+                TotalPoints += e.point_value;
+            }
+        });
+        if (TotalPoints <= 0) {
+            return;
+        }
+        theWheel = new Winwheel({
              'canvasId'    : 'mycanvas',
              'lineWidth'   : 1,
              'animation'   :
@@ -289,13 +301,6 @@ var app = function() {
                          'spins'    : 2,
                          'callbackFinished' : 'afterSpin()'
                      }
-        });
-        TotalPoints = 0;
-        iter = 0;
-        self.vue.suggestions.forEach(function(e) {
-            if (e.point_value > 0) {
-                TotalPoints += e.point_value;
-            }
         });
         self.vue.suggestions.forEach(function(e) {
             console.log('CHANDLER: ');
