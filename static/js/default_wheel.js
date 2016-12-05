@@ -4,12 +4,13 @@ var theWheel;
 var clicked_segment_id;
 var clickedSegment;
 var AugustValera = true;
+var chosen_angle;
 
 var app = function() {
 
     var self = {};
     var earliest_time = '1970-01-01 00:00:00';
-    var refresh_ms = 500;
+    var refresh_ms = 1000;
 
     Vue.config.silent = false; // show all warnings
 
@@ -78,7 +79,6 @@ var app = function() {
                 } else {
                     if (AugustValera) {
                         buildWheelfromList(true);
-                        chosen_one_sugg_id = self.vue.wheel.chosen_one;
                         predeterminedSpin();
                         AugustValera = false;
                     }
@@ -112,8 +112,8 @@ var app = function() {
     }
 
     self.add_suggestion = function() {
-        console.log('add_suggestion(' + wheel_id + ', '
-            + self.vue.adder_name + ', ' + self.vue.adder_description + ')');
+        /*console.log('add_suggestion(' + wheel_id + ', '
+            + self.vue.adder_name + ', ' + self.vue.adder_description + ')');*/
         if(self.vue.wheel.phase == "view") {
             console.log('  Error: in view phase');
         } else if (self.vue.adder_name.length == 0) {
@@ -134,14 +134,14 @@ var app = function() {
     };
 
     self.adder_button = function() {
-        console.log('adder_button()');
+        /*console.log('adder_button()');*/
         $(".add-toggle").toggle();
         self.vue.adder_name = '';
         self.vue.adder_description = '';
     };
 
     self.vote = function(id, points) {
-        console.log('vote(' + id + ', ' + points + ')');
+        /*console.log('vote(' + id + ', ' + points + ')');*/
         var idx = self.vue.suggestions.findIndex(
             function(elem){ return elem.id == id }
         );
@@ -183,7 +183,6 @@ var app = function() {
 
 
     self.choose_winner = function() {
-        console.log('choose winner');
         ttlpts = 0;
         self.vue.suggestions.forEach(function(e) {
             if(e.point_value > 0) {
@@ -201,7 +200,6 @@ var app = function() {
                             wheel: self.vue.wheel.id,
                             chosen_one: self.vue.wheel.chosen_one
                         }, function (data) {
-                            console.log("  return");
                             self.vue.wheel = data;
                         }
                     );
@@ -266,9 +264,8 @@ var app = function() {
 
 
         var TotalPoints = 0;
-        var chosen_angle;
         //get from api
-        var chosen_one_sugg_id;
+
 
         //TESTPopulateSuggestionsList();
         //buildWheelfromList(true);
@@ -307,18 +304,13 @@ var app = function() {
                      }
         });
         self.vue.suggestions.forEach(function(e) {
-            console.log('CHANDLER: ');
-                console.log(e.point_value);
             if (e.point_value > 0) {
                 segSize = 360 * (e.point_value / TotalPoints);
                 addSegmenttoWheel(e.name, segSize);
                 tmpEndSeg = iter + segSize;
-                if (isViewPhase == true && chosen_one_sugg_id == e.id) {
+                if (isViewPhase == true && self.vue.wheel.chosen_one == e.id) {
+                    console.log('@@@@@@@@@@@@@@@@@@@@@@');
                     chosen_angle = Math.random() * ((tmpEndSeg-1) - (iter+1)) + (iter+1);
-                    console.log("e[0]:");
-                    console.log(e.point_value);
-                    console.log("iter");
-                    console.log(iter);
                 }
                 iter = tmpEndSeg;
             }
@@ -341,27 +333,6 @@ var app = function() {
         console.log("chosen_angle:");
         console.log(chosen_angle);
         theWheel.startAnimation();
-    }
-
-    function afterSpin() {
-        var winner = theWheel.getIndicatedSegmentNumber();
-        for (var x = 1; x < theWheel.segments.length; x ++)
-        {
-            theWheel.segments[x].fillStyle = 'gray';
-            console.log(theWheel.segments[x].text);
-        }
-        theWheel.segments[winner].fillStyle = '#f8f8f8';
-        console.log("winner seg number:");
-        console.log(winner);
-        theWheel.draw();
-    }
-
-    function reDrawClear() {
-        theWheel.segments.forEach(function(e) {
-            if (e) {
-                e.fillStyle = '#f8f8f8';
-            }
-        });
     }
 
     function reDrawSelected() {
@@ -404,11 +375,10 @@ var app = function() {
         var winner = theWheel.getIndicatedSegmentNumber();
         for (var x = 1; x < theWheel.segments.length; x ++)
         {
-            theWheel.segments[x].fillStyle = 'gray';
-            console.log(theWheel.segments[x].text);
+            theWheel.segments[x].fillStyle = '#dedede';
         }
-        theWheel.segments[winner].fillStyle = '#f8f8f8';
-        console.log("winner seg number:");
+        theWheel.segments[winner].fillStyle = '#ffab40';
+        console.log("CHANDLER: WINNING SEG NUMBER: ");
         console.log(winner);
         theWheel.draw();
     }
