@@ -8,7 +8,7 @@ List of proposed names for the project
 * Wheel of Choosing (WoC)
 * Wheelr
 * SpinBot
-* Shit just got wheel
+* S*** just got wheel
 * Wheel, wheel, wheel, what do we have here?
 * Training Wheel
 * Jesus take the wheel
