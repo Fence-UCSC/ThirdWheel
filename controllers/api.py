@@ -75,7 +75,7 @@ def edit_wheel():
         response.status=400
         return response.json({"error": "edit_wheel must have a name or description to update to"})
     wheel_entity=db.wheel(wheel)
-    if wheel_entity.creator_id != auth.user_id:
+    if int(wheel_entity.creator_id) != auth.user_id:
         response.status=403
         return response.json({"error":"You are not permitted to edit this wheel"})
     if name != None:
@@ -93,7 +93,7 @@ def del_wheel():
     if wheel == None:
         response.status=400
         return response.json({"error":"wheel must not be null"})
-    if db.wheel(wheel).creator_id != auth.user_id:
+    if int(db.wheel(wheel).creator_id) != auth.user_id:
         response.status=403
         return response.json({"error":"You are not permitted to delete this wheel"})
     suggestion_query=db(db.suggestion.wheel == wheel)
@@ -211,7 +211,7 @@ def choose_winner():
         response.status=400
         return response.json({"error":"wheel and chosen_one must not be null"})
     wheel=db.wheel(wheel_id)
-    if wheel.creator_id != auth.user_id:
+    if int(wheel.creator_id) != auth.user_id:
         response.status=403
         return response.json({"error":"This user is not the creator of the wheel"})
     if wheel.phase == 'view':
