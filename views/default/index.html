@@ -24,7 +24,7 @@
                 </button>
             </div>
             <!-- Raised delete button -->
-            <button v-if="is_adding_wheel" class="mdl-button mdl-js-button mdl-button--raised" v-on:click="cancel_add_button()">
+            <button v-if="is_adding_wheel" class="mdl-button mdl-js-button mdl-color--red" v-on:click="cancel_add_button()">
             Cancel
             </button>
 
@@ -48,7 +48,7 @@
 
                 <div class="form-group" id="submit_record__row">
                     <div>
-                        <input class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" v-on:click="add_wheel_button()" id="add_wheel_submit" type="submit" value="Post" />
+                        <input class="mdl-button mdl-js-button mdl-button--raised mdl-button--primary" v-on:click="add_wheel_button()" id="add_wheel_submit" type="submit" value="Post" />
                     </div>
                 </div>
             </form>
@@ -112,8 +112,8 @@
 
             <div v-if="has_more" class="show_more">
                 <!-- Colored FAB load more button -->
-                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored" id="load-more" v-on:click="get_more()">
-                    <i class="material-icons">add</i>
+                <button class="mdl-button mdl-js-button mdl-button--primary" id="load-more" v-on:click="get_more()">
+                    See more <i class="material-icons">expand_more</i>
                 </button>
             </div>
 
