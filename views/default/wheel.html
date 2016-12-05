@@ -11,7 +11,7 @@
     var user_id = {{=auth.user_id if auth.user_id else 0}};
     var get_wheel_url = "{{=URL('api', 'get_wheel')}}";
     var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
-    var choose_winner_url = "{{=URL('api', 'choose_winner')}}";
+    var choose_winner_url = "{{=URL('api', 'choose_winner', user_signature=True)}}";
     var add_suggestion_url = "{{=URL('api', 'add_suggestion', user_signature=True)}}";
     var vote_url = "{{=URL('api', 'vote', user_signature=True)}}";
 </script>
@@ -239,8 +239,8 @@
                     </li>
                 </ul>
             </div>
-            {{if int(wheel.creator_id) == auth.user_id and wheel.phase != "view":}}
-            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+            {{if int(wheel.creator_id) == auth.user_id:}}
+            <button v-if="wheel && wheel.phase != 'view'" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
                     id="bottom-fab" v-on:click='choose_winner()'>
                 <i class="material-icons">play_arrow</i>
             </button>

@@ -177,6 +177,7 @@ var app = function() {
 
 
     self.choose_winner = function() {
+        console.log('choose winner');
         ttlpts = 0;
         self.vue.suggestions.forEach(function(e) {
             if(e.point_value > 0) {
@@ -192,9 +193,10 @@ var app = function() {
                     $.post(choose_winner_url,
                         {
                             wheel: self.vue.wheel.id,
-                            chosen_one: e.id
+                            chosen_one: self.vue.wheel.chosen_one
                         }, function (data) {
-
+                            console.log("  return");
+                            self.vue.wheel = data;
                         }
                     );
                 }

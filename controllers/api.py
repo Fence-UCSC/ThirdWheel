@@ -203,7 +203,7 @@ def vote():
 # Parameters: wheel=wheel.id, chosen_one=suggestion.id
 # wheel is the wheel to select a resultant suggestion for
 # chosen_one is the wheel's winning suggestion
-@auth.requires_signature
+@auth.requires_signature()
 def choose_winner():
     wheel_id=request.vars.get('wheel')
     chosen_one=request.vars.get('chosen_one')
