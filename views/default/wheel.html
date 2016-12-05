@@ -13,6 +13,7 @@
     var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
     var choose_winner_url = "{{=URL('api', 'choose_winner')}}";
     var add_suggestion_url = "{{=URL('api', 'add_suggestion', user_signature=True)}}";
+    var vote_url = "{{=URL('api', 'vote', user_signature=True)}}";
 </script>
 {{end}}
 
@@ -114,7 +115,7 @@
                     </p>
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
-                    <span class="mdl-chip mdl-chip--contact" v-on:click="goto_profile_url(wheel.creator_id)">
+                    <span class="mdl-chip mdl-chip--contact  mdl-color--accent mdl-color-text--white" v-on:click="goto_profile_url(wheel.creator_id)">
                         <i class="mdl-chip__contact material-icons">person</i>
                         <span class="mdl-chip__text">${wheel.creator_name}</span>
                     </span>
@@ -185,27 +186,65 @@
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Suggestions</h2>
                 </div>
+                <div class="mdl-card__supporting-text">
+                    You have <strong>${free_points}</strong> votes remaining
+                </div>
                 <ul class="mdl-list">
+                    <li v-if="suggestions.length == 0" class="mdl-list__item">
+                        <span class="mdl-list__item-primary-content">
+                            <i class="material-icons mdl-color-text--red mdl-list__item-icon">error</i>
+                            <i>No suggestions have been made</i>
+                        </span>
+                    </li>
                     <li v-for="suggestion in suggestions" class="mdl-list__item mdl-list__item--three-line">
                         <span class="mdl-list__item-primary-content">
-                            <i class="material-icons mdl-list__item-icon">label</i>
-                            <span>${suggestion.name}</span>
+                            <span class="mdl-chip">
+                                <span class="mdl-chip__text"><strong>${suggestion.point_value}</strong></span>
+                            </span>
+                            <span class="mdl-color-text--accent">${suggestion.name}</span>
+                            <small>${suggestion.description}</small>
+
                             <span class="mdl-list__item-text-body">
-                                <button type="button" class="mdl-chip mdl-chip--contact" v-on:click="goto_profile_url(suggestion.creator_id)">
+                                <span class="mdl-chip mdl-chip--contact mdl-color--accent mdl-color-text--white" v-on:click="goto_profile_url(suggestion.creator_id)">
                                     <i class="mdl-chip__contact material-icons">person</i>
-                                    <span class="mdl-chip__text">
-                                        ${suggestion.creator_name}
-                                    </span>
-                                </button>
-                                ${suggestion.description}
+                                    <span class="mdl-chip__text">${suggestion.creator_name}</span>
+                                </span>
+                                <span class="mdl-chip mdl-chip--contact">
+                                    <i class="mdl-chip__contact material-icons">access_time</i>
+                                    <span class="mdl-chip__text">${suggestion.creation_time}</span>
+                                </span>
                             </span>
                         </span>
                         <span class="mdl-list__item-secondary-content">
-                            ${suggestion.point_value}
+                            {{if auth.user_id is not None:}}
+                            <span v-if="wheel.phase != 'view'">
+                                <span class="mdl-chip">
+                                    <span class="mdl-chip__text">
+                                        <button class="mdl-button mdl-js-button mdl-button--icon vote-button"
+                                                v-on:click='vote(suggestion.id, -1)'
+                                                v-bind:class="{'disabled': free_points < 1 && suggestion.user_points <= 0}">
+                                            <i class="material-icons">remove</i>
+                                        </button>
+                                        <strong>${suggestion.user_points}</strong>
+                                        <button class="mdl-button mdl-js-button mdl-button--icon vote-button"
+                                                v-on:click='vote(suggestion.id, 1)'
+                                                v-bind:class="{'disabled': free_points < 1 && suggestion.user_points >= 0}">
+                                            <i class="material-icons">add</i>
+                                        </button>
+                                    </span>
+                                </span>
+                            </span>
+                            {{pass}}
                         </span>
                     </li>
                 </ul>
             </div>
+            {{if int(wheel.creator_id) == auth.user_id and wheel.phase != "view":}}
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+                    id="bottom-fab" onclick='console.log("CHANDLER CHANGE THE PHASE")'>
+                <i class="material-icons">play_arrow</i>
+            </button>
+            {{pass}}
         </div>
 
         <script src="{{=URL('static', 'js/default_wheel.js')}}"></script>

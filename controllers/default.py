@@ -44,7 +44,7 @@ def wheel():
         if wheelr is None:
             session.flash = T('Wheel #' + args + ' does not exist')
             redirect(URL('default','index'))
-        if wheelr.creator_id == auth.user_id:
+        if int(wheelr.creator_id) == auth.user_id:
             form = SQLFORM(db.wheel, wheelr, deletable=True, showid=False)
             form.add_button(T('Cancel'),URL('default','wheel',args=args),_class="btn btn-warning")
 
@@ -67,7 +67,7 @@ def profile():
         user=db.auth_user(user_id)
         name=user.first_name+' '+user.last_name
         wheels=db(db.wheel.creator_id == user_id).select(orderby=~db.wheel.creation_time)
-        suggestions=db(db.suggestion.creator_id == user_id).select()
+        suggestions=db(db.suggestion.creator_id == user_id).select(orderby=~db.suggestion.creation_time)
         bio=db.auth_user(user_id).bio
         return dict(name=name, wheels=wheels, suggestions=suggestions, bio=bio)
     else:

@@ -1,10 +1,10 @@
 .wheel_link {
-    font-size: 1.3em;
+    font-size: 2em;
     color: blue;
 }
 
 .profile_link {
-    font-size: 0.9em;
+    font-size: 1.1em;
     color: green;
 }
 
@@ -28,13 +28,18 @@
 
 #too_long {
     overflow: auto;
-    width: 650px;
+    color: black;
 }
 
 #too_long_name {
     overflow: auto;
-    width: 650px;
 }
+
+#list-container {
+    width: 100%;
+}
+
+
 
 
 

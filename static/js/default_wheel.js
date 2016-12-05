@@ -21,7 +21,7 @@ var app = function() {
                 newer_than: newer_than
             }, function (data) {
                 if(! data.message) {
-                    console.log('  Updated wheel data')
+                    console.log('  Updated wheel data');
                     self.vue.wheel = data;
                 }
                 self.get_suggestions();
@@ -46,9 +46,10 @@ var app = function() {
                         console.log("  Updated suggestion " + self.vue.suggestions[idx].id)
                         self.vue.suggestions[idx].name = updated.name;
                         self.vue.suggestions[idx].description = updated.description;
+                        self.vue.suggestions[idx].creator_name = updated.creator_name;
                         self.vue.suggestions[idx].update_time = updated.description;
                         self.vue.suggestions[idx].point_value = updated.point_value;
-                        if(user_id) self.vue.suggestions[idx].point_user = updated.point_user;
+                        if(user_id) self.vue.suggestions[idx].user_points = updated.user_points;
                     } else {
                         console.log("  Added suggestion " + updated.id);
                         self.vue.suggestions.push(updated);
@@ -80,9 +81,33 @@ var app = function() {
                     chosen_one_sugg_id = self.vue.wheel.chosen_one;
                     predeterminedSpin();
                 }
+                self.sort_suggestions();
+                if(! self.vue.free_points_init) self.free_pointers();
             }
         );
     };
+
+    self.sort_suggestions = function() {
+        self.vue.suggestions.sort(function(a, b) {
+            if(a.point_value == b.point_value) {
+                if(a.name < b.name) {
+                    return -1;
+                } else if(a.name == b.name) {
+                    return 0;
+                } else return 1;
+            } else if(a.point_value < b.point_value) {
+                return 1;
+            } else return -1;
+        });
+    }
+
+    self.free_pointers = function() {
+        var points = total_points;
+        self.vue.suggestions.forEach(function(elem) {
+            points -= Math.abs(elem.user_points);
+        });
+        self.vue.free_points = points;
+    }
 
     self.add_suggestion = function() {
         console.log('add_suggestion(' + wheel_id + ', '
@@ -98,7 +123,8 @@ var app = function() {
                     wheel: wheel_id,
                     name: self.vue.adder_name,
                     description: self.vue.adder_description
-                }, function () {
+                }, function (data) {
+                    self.vue.suggestions.push(data);
                     self.adder_button();
                 }
             );
@@ -114,20 +140,31 @@ var app = function() {
 
     self.vote = function(id, points) {
         console.log('vote(' + id + ', ' + points + ')');
+        var idx = self.vue.suggestions.findIndex(
+            function(elem){ return elem.id == id }
+        );
         if(self.vue.wheel.phase == "view") {
             console.log('  Error: in view phase');
-        } else if (! id || id <= 0 || ! points) {
+        } else if(! id || id <= 0 || ! points) {
             console.log('  Error: no title given');
+        } else if(self.vue.free_points < 1
+            && (Math.abs(self.vue.suggestions[idx].user_points + points) > total_points)) {
+            console.log('  Error: vote would exceed free point allowance');
         } else {
                 $.post(vote_url,
-                {
-                    wheel: wheel_id,
-                    name: self.vue.adder_name,
-                    description: self.vue.adder_description
-                }, function () {
-                    self.adder_button();
-                }
-            );
+                    {
+                        suggestion: id,
+                        points_to_allocate: points
+                    }, function (data) {
+                        var idx = self.vue.suggestions.findIndex(
+                            function(elem){ return elem.id == id }
+                        );
+                        self.vue.suggestions[idx].user_points += points;
+                        self.vue.suggestions[idx].point_value += points;
+                        self.vue.free_points = data.points_left_for_user;
+                        self.sort_suggestions();
+                    }
+                );
         }
     };
 
@@ -197,7 +234,9 @@ var app = function() {
             suggestions: [],
             suggestions_updated: earliest_time,
             adder_name: null,
-            adder_description: null
+            adder_description: null,
+            free_points: total_points,
+            free_points_init: false
         },
         methods: {
             get_wheel: self.get_wheel,
@@ -205,7 +244,10 @@ var app = function() {
             add_suggestion: self.add_suggestion,
             choose_winner: self.choose_winner,
             adder_button: self.adder_button,
-            goto_profile_url: self.goto_profile_url
+            goto_profile_url: self.goto_profile_url,
+            vote: self.vote,
+            sort_suggestions: self.sort_suggestions,
+            free_pointers: self.free_pointers
         }
     });
 
@@ -222,7 +264,9 @@ var app = function() {
         var TotalPoints = 0;
         var chosen_angle;
         //get from api
-        var chosen_one_sugg_id = 0;
+        var chosen_one_sugg_id;
+
+        //TESTPopulateSuggestionsList();
         //buildWheelfromList(true);
         //predeterminedSpin();
 
@@ -234,6 +278,7 @@ var app = function() {
             }
         });
     }
+
 
         function buildWheelfromList(isViewPhase) {
          theWheel = new Winwheel({

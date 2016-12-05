@@ -22,11 +22,12 @@ def get_wheels():
                 chosen_one_string = 'N/A'
             else:
                 chosen_one_string = db(db.suggestion.id == r.chosen_one).select().first().name
-            creator_name = db(db.auth_user.id == r.creator_id).select().first().email
+            creator_email = db(db.auth_user.id == r.creator_id).select().first().email
             t = dict(
                 id=r.id,
                 creator_id=r.creator_id,
-                creator_name=creator_name,
+                creator_name=id_to_name(r.creator_id),
+                creator_email=creator_email,
                 name=r.name,
                 description=r.description,
                 creation_time=r.creation_time,
@@ -74,4 +75,8 @@ def del_wheel():
     """Used to delete a post."""
     # Implement me!
     db(db.wheel.id == request.vars.wheel_id).delete()
+    suggestion_query=db(db.suggestion.wheel == request.vars.wheel_id)
+    for suggestion in suggestion_query.select(db.suggestion.id):
+        db(db.vote == suggestion.id).delete()
+    suggestion_query.delete()
     return "ok"

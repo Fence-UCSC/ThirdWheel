@@ -74,12 +74,16 @@ def edit_wheel():
     if name == None and description == None:
         response.status=400
         return response.json({"error": "edit_wheel must have a name or description to update to"})
+    wheel_entity=db.wheel(wheel)
+    if int(wheel_entity.creator_id) != auth.user_id:
+        response.status=403
+        return response.json({"error":"You are not permitted to edit this wheel"})
     if name != None:
-        db.wheel(wheel).update_record(name=name)
+        wheel_entity.update_record(name=name)
     if description != None:
-        db.wheel(wheel).update_record(description=description)
-    db.wheel(wheel).update_record(edited_time=datetime.datetime.utcnow())
-    return response.json(db.wheel(wheel))
+        wheel_entity.update_record(description=description)
+    wheel_entity.update_record(edited_time=datetime.datetime.utcnow())
+    return response.json(wheel_entity)
     
 # Parameters: wheel=wheel.id
 # wheel is the wheel to delete
@@ -89,6 +93,13 @@ def del_wheel():
     if wheel == None:
         response.status=400
         return response.json({"error":"wheel must not be null"})
+    if int(db.wheel(wheel).creator_id) != auth.user_id:
+        response.status=403
+        return response.json({"error":"You are not permitted to delete this wheel"})
+    suggestion_query=db(db.suggestion.wheel == wheel)
+    for suggestion in suggestion_query.select(db.suggestion.id):
+        db(db.vote == suggestion.id).delete()
+    suggestion_query.delete()
     db.wheel(wheel).delete()
     
 # Parameters: wheel=wheel.id, name=<string>, [description=<string>]
@@ -164,22 +175,29 @@ def vote():
         response.status=400
         return response.json({"error":"suggestion and points_to_allocate must not be null"})
     points=int(points_string)
+    suggestion_entity = db.suggestion(suggestion)
+    if db.wheel(suggestion_entity.wheel).phase == 'view':
+        response.status=403
+        return response.json({"error":"this wheel is past its voting phase"})
     vote_query=db((db.vote.voter == auth.user_id) & (db.vote.suggestion == suggestion))
+    vote_sum=sum_points_for_user(auth.user_id, suggestion)
     if vote_query.count() == 0:
         # user has not previously voted on this suggestion
-        if sum_points_for_user(auth.user_id, suggestion)+abs(points) > 10:
+        if vote_sum+abs(points) > 10:
             return response.json({"message":"this vote would exceed the number of allocatable points"})
         db.vote.insert(points_allocated=points, suggestion=suggestion)
+        vote_sum += points
     else:
         # user has previously voted on this suggestion
         vote=vote_query.select().first()
         new_points=vote.points_allocated+points
         net_change_in_points_allocated=abs(new_points)-abs(vote.points_allocated)
-        if sum_points_for_user(auth.user_id, suggestion)+net_change_in_points_allocated > 10:
+        if vote_sum+net_change_in_points_allocated > 10:
             return response.json({"message":"this vote would exceed the number of allocatable points"})
         vote.update_record(points_allocated=new_points)
-    suggestion_entity = db.suggestion(suggestion)
-    suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, edited_on=datetime.datetime.utcnow())
+        vote_sum += net_change_in_points_allocated
+    suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, update_time=datetime.datetime.utcnow())
+    suggestion_entity.points_left_for_user=10-vote_sum
     return response.json(suggestion_entity)
         
 # Parameters: wheel=wheel.id, chosen_one=suggestion.id
@@ -193,7 +211,7 @@ def choose_winner():
         response.status=400
         return response.json({"error":"wheel and chosen_one must not be null"})
     wheel=db.wheel(wheel_id)
-    if wheel.creator_id != auth.user_id:
+    if int(wheel.creator_id) != auth.user_id:
         response.status=403
         return response.json({"error":"This user is not the creator of the wheel"})
     if wheel.phase == 'view':
