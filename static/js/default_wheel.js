@@ -9,7 +9,7 @@ var app = function() {
 
     var self = {};
     var earliest_time = '1970-01-01 00:00:00';
-    var refresh_ms = 5000;
+    var refresh_ms = 500;
 
     Vue.config.silent = false; // show all warnings
 

@@ -218,4 +218,5 @@ def choose_winner():
         response.status=403
         return response.json({"error":"A winner has already been chosen for this wheel"})
     wheel.update_record(phase="view", edited_time=datetime.datetime.utcnow(), chosen_one=chosen_one)
+    wheel.creator_name = id_to_name(wheel.creator_id)
     return response.json(wheel)

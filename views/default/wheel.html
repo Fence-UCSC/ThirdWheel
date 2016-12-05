@@ -99,9 +99,11 @@
                     {{=form}}
                 </div>
             </div>
-            <div v-if="wheel" class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
+            <div v-if="wheel" class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle"
+                 v-bind:style="{'background-color': wheel.phase == 'view' ? '#F7F7F7' : '#FAFAFA' }">
                 {{if int(wheel.creator_id) == auth.user_id:}}
-                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+                <button v-if="wheel.phase != 'view'"
+                        class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
                         id="card-fab" onclick='$(".edit-toggle").toggle()'>
                     <i class="material-icons">edit</i>
                 </button>
@@ -127,11 +129,16 @@
                         <i class="mdl-chip__contact material-icons">mode_edit</i>
                         <span class="mdl-chip__text">${wheel.edited_time}</span>
                     </span>
+                    <span v-if="wheel.phase == 'view'"
+                          class="mdl-chip mdl-chip--contact mdl-color--red mdl-color-text--white">
+                        <i class="mdl-chip__contact material-icons">remove_red_eye</i>
+                        <span class="mdl-chip__text">Read only</span>
+                    </span>
                 </div>
             </div>
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
                 <div class="mdl-card__title">
-                    <h2 class="mdl-card__title-text">Placeholder for wheel spinner</h2>
+                    <h2 class="mdl-card__title-text">ChandlrWheelr</h2>
                 </div>
 
 
@@ -179,7 +186,8 @@
 
             </div>
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col">
-                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored
+                <button v-if="wheel && wheel.phase != 'view'"
+                        class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored
                 add-toggle" id="card-fab" v-on:click='adder_button()'>
                     <i class="material-icons">add</i>
                 </button>
