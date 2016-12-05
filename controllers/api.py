@@ -74,12 +74,16 @@ def edit_wheel():
     if name == None and description == None:
         response.status=400
         return response.json({"error": "edit_wheel must have a name or description to update to"})
+    wheel_entity=db.wheel(wheel)
+    if wheel_entity.creator_id != auth.user_id:
+        response.status=403
+        return response.json({"error":"You are not permitted to edit this wheel"})
     if name != None:
-        db.wheel(wheel).update_record(name=name)
+        wheel_entity.update_record(name=name)
     if description != None:
-        db.wheel(wheel).update_record(description=description)
-    db.wheel(wheel).update_record(edited_time=datetime.datetime.utcnow())
-    return response.json(db.wheel(wheel))
+        wheel_entity.update_record(description=description)
+    wheel_entity.update_record(edited_time=datetime.datetime.utcnow())
+    return response.json(wheel_entity)
     
 # Parameters: wheel=wheel.id
 # wheel is the wheel to delete
@@ -89,6 +93,9 @@ def del_wheel():
     if wheel == None:
         response.status=400
         return response.json({"error":"wheel must not be null"})
+    if db.wheel(wheel).creator_id != auth.user_id:
+        response.status=403
+        return response.json({"error":"You are not permitted to delete this wheel"})
     suggestion_query=db(db.suggestion.wheel == wheel)
     for suggestion in suggestion_query.select(db.suggestion.id):
         db(db.vote == suggestion.id).delete()
