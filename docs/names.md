@@ -10,3 +10,7 @@ List of proposed names for the project
 * SpinBot
 * Shit just got wheel
 * Wheel, wheel, wheel, what do we have here?
+* Training Wheel
+* Jesus take the wheel
+* on a roll
+* No need to reinvent the wheel
