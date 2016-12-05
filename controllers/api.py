@@ -89,6 +89,10 @@ def del_wheel():
     if wheel == None:
         response.status=400
         return response.json({"error":"wheel must not be null"})
+    suggestion_query=db(db.suggestion.wheel == wheel)
+    for suggestion in suggestion_query.select(db.suggestion.id):
+        db(db.vote == suggestion.id).delete()
+    suggestion_query.delete()
     db.wheel(wheel).delete()
     
 # Parameters: wheel=wheel.id, name=<string>, [description=<string>]
