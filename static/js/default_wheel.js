@@ -1,6 +1,8 @@
 // This is the js for the default/wheel.html view.
 
 var theWheel;
+var clicked_segment_id;
+var clickedSegment;
 
 var app = function() {
 
@@ -69,8 +71,15 @@ var app = function() {
                         return 1;
                     } else return -1;
                 });
-                buildWheelfromList(true);
-                predeterminedSpin();
+                if (self.vue.wheel.phase == 'create') {
+                    buildWheelfromList(false);
+                    reDrawSelected();
+                    chooseWinner();
+                } else {
+                    buildWheelfromList(true);
+                    chosen_one_sugg_id = self.vue.wheel.chosen_one;
+                    predeterminedSpin();
+                }
             }
         );
     };
@@ -120,7 +129,57 @@ var app = function() {
                 }
             );
         }
-    }
+    };
+
+
+
+
+
+
+
+
+
+    self.choose_winner = function() {
+        var newer_than = (self.vue.wheel ? self.vue.wheel.edited_time.toString() : earliest_time);
+        $.post(get_suggestions_url,
+            {
+                wheel: wheel_id,
+                newer_than: newer_than
+            }, function (data) {
+                ttlpts = 0;
+                data.forEach(function(e) {
+                    if(e.point_value > 0) {
+                        ttlpts += e.point_value;
+                    }
+                });
+                rnd = Math.floor(Math.random() * (ttlpts));
+                data.forEach(function(e) {
+                    if(e.point_value > 0) {
+                        ttlpts += e.point_value;
+                        if (rnd < ttlpts) {
+                            self.vue.wheel.chosen_one = e.id;
+                            $.choose_winner(choose_winner_url,
+                                {
+                                }, function () {
+                                }
+                            );
+                        }
+                    }
+                });
+            }
+        );
+    };
+
+
+
+
+
+
+
+
+
+
+
 
     self.goto_profile_url = function(creator_id){
         var url = '../profile/';
@@ -144,6 +203,7 @@ var app = function() {
             get_wheel: self.get_wheel,
             get_suggestions: self.get_suggestions,
             add_suggestion: self.add_suggestion,
+            choose_winner: self.choose_winner,
             adder_button: self.adder_button,
             goto_profile_url: self.goto_profile_url
         }
@@ -159,36 +219,12 @@ var app = function() {
 
 
 
-
-    var SuggestionsList = new Array();
         var TotalPoints = 0;
-        //var theWheel;
         var chosen_angle;
         //get from api
-        var chosen_one_sugg_id;
-
-        chosen_one_sugg_id = 1;
-        //TESTPopulateSuggestionsList();
+        var chosen_one_sugg_id = 0;
         //buildWheelfromList(true);
         //predeterminedSpin();
-
-    function TESTPopulateSuggestionsList()
-    {
-        SuggestionsList.push([1, "bob1", "1tunak tunak1", "cool dance moves", null, 5]);
-        SuggestionsList.push([2, "bob2", "2tunak tunak2", "cool dance moves2", null, 5]);
-        SuggestionsList.push([3, "bob3", "3tunak tunak3", "cool dance moves3", null, 3]);
-        SuggestionsList.push([4, "bob4", "4tunak tunak4", "cool dance moves4", null, 2]);
-        SuggestionsList.push([5, "bob5", "5tunak tunak5", "cool dance moves5", null, 0]);
-        SuggestionsList.push([6, "bob6", "6tunak tunak6", "cool dance moves6", null, -10]);
-        TotalPoints = 15;
-    }
-
-    function addtoSuggestionsList(Id, creator, name, description, timestamps, pointvalue)
-    {
-        var Suggestion = [Id, creator, name, description, timestamps, pointvalue];
-        SuggestionsList.push(Suggestion);
-        buildWheelfromList(false);
-    }
 
     function adjustPointValueforSegment(Id, pointsadded) {
         SuggestionsList.forEach(function(e) {
@@ -198,7 +234,6 @@ var app = function() {
             }
         });
     }
-
 
         function buildWheelfromList(isViewPhase) {
          theWheel = new Winwheel({
@@ -268,6 +303,42 @@ var app = function() {
         console.log(winner);
         theWheel.draw();
     }
+
+    function reDrawClear() {
+        theWheel.segments.forEach(function(e) {
+            if (e) {
+                e.fillStyle = '#f8f8f8';
+            }
+        });
+    }
+
+    function reDrawSelected() {
+        if (clickedSegment)
+        {
+            reDrawClear();
+            clickedSegment.fillStyle = 'gray';
+            clicked_segment_id =
+            theWheel.draw();
+        }
+    }
+
+    var canvas = document.getElementById('mycanvas');
+    canvas.onclick = function (e)
+    {
+        clickedSegment = theWheel.getSegmentAt(e.clientX, e.clientY);
+        if (clickedSegment)
+        {
+            reDrawClear();
+            clickedSegment.fillStyle = 'gray';
+            clicked_segment_id =
+            theWheel.draw();
+        }
+    };
+
+    function chooseWinner() {
+
+    }
+
 
 
     self.vue.get_wheel();

@@ -11,6 +11,7 @@
     var user_id = {{=auth.user_id if auth.user_id else 0}};
     var get_wheel_url = "{{=URL('api', 'get_wheel')}}";
     var get_suggestions_url = "{{=URL('api', 'get_suggestions')}}";
+    var choose_winner_url = "{{=URL('api', 'choose_winner')}}";
     var add_suggestion_url = "{{=URL('api', 'add_suggestion', user_signature=True)}}";
 </script>
 {{end}}
@@ -33,9 +34,8 @@
                 display: none;
             }
             #mycanvas {
-                width: 95%;
-                height: auto;
-                margin: auto;
+                margin-left: auto;
+                margin-right: auto;
                 z-index: 1;
             }
             canvas {
@@ -49,6 +49,10 @@
                 right: 0;
                 top: 0;
                 z-index: 99;
+            }
+            #wheeldivinner {
+                margin: 0 auto;
+                z-index: 1;
             }
             #wheeldiv {
                 margin-top: 0;
@@ -128,12 +132,19 @@
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Placeholder for wheel spinner</h2>
                 </div>
+
+
                 <div id="wheeldiv">
                     <img id = "pointer" src = "{{=URL('static', 'images/choose_arrow.png')}}"/>
-                    <canvas id='mycanvas' height='300'>
-                        Canvas not supported, use another browser.
-                    </canvas>
+                    <div id="wheeldivinner">
+                        <canvas id='mycanvas' height='400' width='400'>
+                            Canvas not supported, use another browser.
+                        </canvas>
+                    </div>
+                    <div style="clear: both"></div>
                 </div>
+
+
             </div>
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col add-toggle" id="adder">
                 <form v-on:submit.prevent="add_suggestion" method="post">
