@@ -103,7 +103,8 @@
             <div v-if="wheel" class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--6-col edit-toggle">
                 {{if int(wheel.creator_id) == auth.user_id:}}
                 <button v-if="wheel.phase != 'view'"
-                        class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+                        class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored
+                        mdl-color-text--white"
                         id="card-fab" onclick='$(".edit-toggle").toggle()'>
                     <i class="material-icons">edit</i>
                 </button>
@@ -189,7 +190,7 @@
             <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--12-col">
                 <button v-if="wheel && wheel.phase != 'view'"
                         class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored
-                add-toggle" id="card-fab" v-on:click='adder_button()'>
+                        mdl-color-text--white add-toggle" id="card-fab" v-on:click='adder_button()'>
                     <i class="material-icons">add</i>
                 </button>
                 <div class="mdl-card__title">
@@ -205,7 +206,8 @@
                             <i>No suggestions have been made</i>
                         </span>
                     </li>
-                    <li v-for="suggestion in suggestions" class="mdl-list__item mdl-list__item--three-line">
+                    <li v-for="suggestion in suggestions" class="mdl-list__item mdl-list__item--three-line"
+                    v-bind:style="{'background-color': suggestion.id == wheel.chosen_one ? '#FAFAFA' : 'white'}">
                         <span class="mdl-list__item-primary-content">
                             <span class="mdl-chip">
                                 <span class="mdl-chip__text"><strong>${suggestion.point_value}</strong></span>
@@ -214,7 +216,8 @@
                             <small>${suggestion.description}</small>
 
                             <span class="mdl-list__item-text-body">
-                                <span class="mdl-chip mdl-chip--contact mdl-color--accent mdl-color-text--white" v-on:click="goto_profile_url(suggestion.creator_id)">
+                                <span class="mdl-chip mdl-chip--contact mdl-color--accent mdl-color-text--white"
+                                      v-on:click="goto_profile_url(suggestion.creator_id)">
                                     <i class="mdl-chip__contact material-icons">person</i>
                                     <span class="mdl-chip__text">${suggestion.creator_name}</span>
                                 </span>
@@ -249,7 +252,8 @@
                 </ul>
             </div>
             {{if int(wheel.creator_id) == auth.user_id:}}
-            <button v-if="wheel && wheel.phase != 'view'" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+            <button v-if="wheel && wheel.phase != 'view'" class="mdl-button mdl-js-button mdl-button--fab
+            mdl-js-ripple-effect mdl-button--colored mdl-color-text--white"
                     id="bottom-fab" v-on:click='choose_winner()'>
                 <i class="material-icons">play_arrow</i>
             </button>
