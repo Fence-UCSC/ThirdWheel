@@ -195,9 +195,12 @@ var app = function() {
                         ttlpts += e.point_value;
                         if (rnd < ttlpts) {
                             self.vue.wheel.chosen_one = e.id;
-                            $.choose_winner(choose_winner_url,
+                            $.post(choose_winner_url,
                                 {
-                                }, function () {
+                                    wheel: self.vue.wheel.id,
+                                    chosen_one: e.id
+                                }, function (data) {
+
                                 }
                             );
                         }

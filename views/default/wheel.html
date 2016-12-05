@@ -241,7 +241,7 @@
             </div>
             {{if int(wheel.creator_id) == auth.user_id and wheel.phase != "view":}}
             <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
-                    id="bottom-fab" onclick='console.log("CHANDLER CHANGE THE PHASE")'>
+                    id="bottom-fab" v-on:click='choose_winner()'>
                 <i class="material-icons">play_arrow</i>
             </button>
             {{pass}}
@@ -250,9 +250,3 @@
         <script src="{{=URL('static', 'js/default_wheel.js')}}"></script>
 
         {{pass}}
-
-        <button onClick="predeterminedSpin()">Spin</button>
-        <button onClick="winwheelStopAnimation();buildWheelfromList(true);">Reset</button>
-        <button onClick="addtoSuggestionsList(99, 'bob', 'doug dimmadome', 'dimmsdale dimmadome', null, 1)">Add a Segment</button>
-        <button onClick="adjustPointValueforSegment(1, 1)">Upvote 1 by 1</button>
-        <button onClick="adjustPointValueforSegment(1, -2)">Downvoate 1 by 2</button>
