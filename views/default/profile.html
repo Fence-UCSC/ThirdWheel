@@ -2,6 +2,7 @@
 
 <div>
     {{if len(request.args) > 0:}}
+        <a href="{{=URL('default', 'profile')}}"><p>< All Profiles</p></a>
         <h2>{{=name}}</h2>
         <h3>Bio</h3>
         <div>{{=bio}}</div>
