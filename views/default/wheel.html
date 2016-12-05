@@ -109,7 +109,6 @@
                     <p>
                         ${wheel.description}
                     </p>
-                    points left = ${free_points}
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
                     <span class="mdl-chip mdl-chip--contact  mdl-color--accent mdl-color-text--white" v-on:click="goto_profile_url(wheel.creator_id)">
@@ -176,6 +175,9 @@
                 <div class="mdl-card__title">
                     <h2 class="mdl-card__title-text">Suggestions</h2>
                 </div>
+                <div class="mdl-card__supporting-text">
+                    You have <strong>${free_points}</strong> votes remaining
+                </div>
                 <ul class="mdl-list">
                     <li v-if="suggestions.length == 0" class="mdl-list__item">
                         <span class="mdl-list__item-primary-content">
@@ -186,7 +188,7 @@
                     <li v-for="suggestion in suggestions" class="mdl-list__item mdl-list__item--three-line">
                         <span class="mdl-list__item-primary-content">
                             <span class="mdl-chip">
-                                <span class="mdl-chip__text">${suggestion.point_value}</span>
+                                <span class="mdl-chip__text"><strong>${suggestion.point_value}</strong></span>
                             </span>
                             <span class="mdl-color-text--accent">${suggestion.name}</span>
                             <small>${suggestion.description}</small>
@@ -226,6 +228,12 @@
                     </li>
                 </ul>
             </div>
+            {{if int(wheel.creator_id) == auth.user_id and wheel.phase != "view":}}
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+                    id="bottom-fab" onclick='console.log("CHANDLER CHANGE THE PHASE")'>
+                <i class="material-icons">play_arrow</i>
+            </button>
+            {{pass}}
         </div>
 
         <script src="{{=URL('static', 'js/default_wheel.js')}}"></script>

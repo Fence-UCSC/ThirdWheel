@@ -19,7 +19,7 @@ var app = function() {
                 newer_than: newer_than
             }, function (data) {
                 if(! data.message) {
-                    console.log('  Updated wheel data')
+                    console.log('  Updated wheel data');
                     self.vue.wheel = data;
                 }
                 self.get_suggestions();
