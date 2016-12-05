@@ -156,13 +156,17 @@ var app = function() {
                         suggestion: id,
                         points_to_allocate: points
                     }, function (data) {
-                        var idx = self.vue.suggestions.findIndex(
-                            function(elem){ return elem.id == id }
-                        );
-                        self.vue.suggestions[idx].user_points += points;
-                        self.vue.suggestions[idx].point_value += points;
-                        self.vue.free_points = data.points_left_for_user;
-                        self.sort_suggestions();
+                        if(! data.message) {
+                            var idx = self.vue.suggestions.findIndex(
+                                function (elem) {
+                                    return elem.id == id
+                                }
+                            );
+                            self.vue.suggestions[idx].user_points += points;
+                            self.vue.suggestions[idx].point_value += points;
+                            self.vue.free_points = data.points_left_for_user;
+                            self.sort_suggestions();
+                        }
                     }
                 );
         }
