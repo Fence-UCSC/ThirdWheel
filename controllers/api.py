@@ -185,7 +185,7 @@ def vote():
             return response.json({"message":"this vote would exceed the number of allocatable points"})
         vote.update_record(points_allocated=new_points)
         vote_sum += net_change_in_points_allocated
-    suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, edited_on=datetime.datetime.utcnow())
+    suggestion_entity.update_record(point_value=suggestion_entity.point_value+points, update_time=datetime.datetime.utcnow())
     suggestion_entity.points_left_for_user=10-vote_sum
     return response.json(suggestion_entity)
         
