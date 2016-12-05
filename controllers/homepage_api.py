@@ -75,4 +75,8 @@ def del_wheel():
     """Used to delete a post."""
     # Implement me!
     db(db.wheel.id == request.vars.wheel_id).delete()
+    suggestion_query=db(db.suggestion.wheel == request.vars.wheel_id)
+    for suggestion in suggestion_query.select(db.suggestion.id):
+        db(db.vote == suggestion.id).delete()
+    suggestion_query.delete()
     return "ok"
