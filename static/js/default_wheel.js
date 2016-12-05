@@ -185,7 +185,7 @@ var app = function() {
             }
         });
         rnd = Math.floor(Math.random() * (ttlpts));
-        self.vue.suggestions.forEach(function(e) {
+        self.vue.suggestions.forEach(function loop(e) {
             if(e.point_value > 0) {
                 ttlpts += e.point_value;
                 if (rnd < ttlpts) {
@@ -199,6 +199,7 @@ var app = function() {
                             self.vue.wheel = data;
                         }
                     );
+                    loop.stop = true;
                 }
             }
         });
