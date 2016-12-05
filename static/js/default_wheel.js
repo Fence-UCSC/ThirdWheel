@@ -150,7 +150,7 @@ var app = function() {
         } else if(! id || id <= 0 || ! points) {
             console.log('  Error: no title given');
         } else if(self.vue.free_points < 1
-            && (Math.abs(self.vue.suggestions[idx].user_points + points) > total_points)) {
+            && ((self.vue.suggestions[idx].user_points * points) > 0)) {
             console.log('  Error: vote would exceed free point allowance');
         } else {
                 $.post(vote_url,
@@ -158,13 +158,17 @@ var app = function() {
                         suggestion: id,
                         points_to_allocate: points
                     }, function (data) {
-                        var idx = self.vue.suggestions.findIndex(
-                            function(elem){ return elem.id == id }
-                        );
-                        self.vue.suggestions[idx].user_points += points;
-                        self.vue.suggestions[idx].point_value += points;
-                        self.vue.free_points = data.points_left_for_user;
-                        self.sort_suggestions();
+                        if(! data.message) {
+                            var idx = self.vue.suggestions.findIndex(
+                                function (elem) {
+                                    return elem.id == id
+                                }
+                            );
+                            self.vue.suggestions[idx].user_points += points;
+                            self.vue.suggestions[idx].point_value += points;
+                            self.vue.free_points = data.points_left_for_user;
+                            self.sort_suggestions();
+                        }
                     }
                 );
         }
