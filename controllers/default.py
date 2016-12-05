@@ -44,7 +44,7 @@ def wheel():
         if wheelr is None:
             session.flash = T('Wheel #' + args + ' does not exist')
             redirect(URL('default','index'))
-        if wheelr.creator_id == auth.user_id:
+        if int(wheelr.creator_id) == auth.user_id:
             form = SQLFORM(db.wheel, wheelr, deletable=True, showid=False)
             form.add_button(T('Cancel'),URL('default','wheel',args=args),_class="btn btn-warning")
 
