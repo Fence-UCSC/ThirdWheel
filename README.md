@@ -10,7 +10,7 @@ Check us out on
 [PythonAnywhere](https://fence.pythonanywhere.com/ThirdWheel).
 
 ## Name
-The story behind the name of this project can be read [here](docs/names.md)
+The story behind the name of this project can be read [here](docs/names.md).
 
 ## Logistics
 Here are some resources relating to our submission to the webapps class:
@@ -21,4 +21,4 @@ Here are some resources relating to our submission to the webapps class:
 
 ## Scrum board
 The scrum board for the project can be found on
-[Waffle.io](https://waffle.io/Fence-UCSC/ThirdWheel)
+[Waffle.io](https://waffle.io/Fence-UCSC/ThirdWheel).

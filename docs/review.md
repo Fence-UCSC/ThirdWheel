@@ -3,6 +3,7 @@
 The following is taken from the Crowdgrader review for this assignment.
 
 ## Evaluation
+| | |
 | --- | --- |
 | Submission grade | 7.50 [0 ... 10.0] |
 | Submission percentile | 100% |
